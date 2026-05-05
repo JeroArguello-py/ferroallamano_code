@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background-color: #EBF4F1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.login-card {
+    background-color: #ffffff;
+    width: 400px;
+    padding: 40px 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border-top: 6px solid #D97706; 
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.card-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+}
+
+.card-header .subtitle {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.form-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.form-header .welcome {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #374151;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.forgot-pass {
+    font-size: 10px;
+    color: #D97706;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 12px 12px 35px;
+    background-color: #E2E8E4; 
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #374151;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-wrapper input:focus {
+    border-color: #D97706;
+    background-color: #ffffff;
+}
+
+.input-wrapper input::placeholder {
+    color: #9ca3af;
+}
+
+.toggle-pass {
+    position: absolute;
+    right: 12px;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.checkbox-group input {
+    margin-right: 8px;
+    accent-color: #D97706;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    font-size: 12px;
+    font-weight: 400;
+    color: #4b5563;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #D97706; 
+    color: #1a1a1a;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #c26905;
+}

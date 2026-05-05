@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Iniciar Sesión</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="card-header">
+                <h1>FERROALLAMANO</h1>
+                <p class="subtitle">Lo mejor de ocaña</p>
+            </div>
+            
+            <div class="form-header">
+                <h2>Iniciar Sesión</h2>
+                <p class="welcome">bienvenido</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">CORREO ELECTRÓNICO</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope icon"></i>
+                        <input type="email" id="email" placeholder="tu@empresa.com" required>
+                    </div>
+                </div>
+                
+            
+                <div class="input-group">
+                    <div class="label-row">
+                        <label for="password">CONTRASEÑA</label>
+                        <a href="#" class="forgot-pass">Olvidé mi contraseña</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock icon"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                        <i class="fa-regular fa-eye toggle-pass" id="togglePassword"></i>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Recuérdame</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
