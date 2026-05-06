@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Nuevo Cliente</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/newClient.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">FERROALLAMANO</span>
+                    <span class="logo-sub">dashboard</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/dashboard" class="nav-item">
+                        <i class="fa-solid fa-table-cells-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="#" class="nav-item active">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Clientes</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="btn-sidebar-alt" onclick="window.location.href='/clientes/nuevo'">+ Nuevo cliente</button>
+                <button class="btn-sidebar-alt">+ Nueva Venta</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-breadcrumb">
+                    <i class="fa-solid fa-users breadcrumb-icon"></i>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Nuevo Cliente</span>
+                </div>
+                <div class="topbar-actions">
+                    <i class="fa-regular fa-bell icon-topbar"></i>
+                    <i class="fa-regular fa-circle-user icon-topbar user-avatar"></i>
+                </div>
+            </header>
+
+            <div class="dashboard-area">
+                <div class="content-header">
+                    <div class="content-header-titles">
+                        <h1>Registro de Nuevo Cliente</h1>
+                        <p>Ingrese la información detallada del cliente para añadirlo a la base de datos</p>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <form id="newClientForm">
+
+                        <%# Fila 1: Nombre y Documento %>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre" class="form-label">NOMBRE COMPLETO / RAZÓN SOCIAL</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        type="text"
+                                        id="nombre"
+                                        name="nombre"
+                                        class="form-input"
+                                        placeholder="Ej. Constructora Andina S.A."
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="documento" class="form-label">DOCUMENTO DE IDENTIDAD (DNI/RUC)</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        type="text"
+                                        id="documento"
+                                        name="documento"
+                                        class="form-input"
+                                        placeholder="Ej. 20123456789"
+                                        required
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <%# Fila 2: Teléfono y Correo %>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="telefono" class="form-label">TELÉFONO</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-phone input-icon"></i>
+                                    <input
+                                        type="tel"
+                                        id="telefono"
+                                        name="telefono"
+                                        class="form-input has-icon"
+                                        placeholder="+57 987 654 321"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="correo" class="form-label">CORREO ELECTRÓNICO</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-regular fa-envelope input-icon"></i>
+                                    <input
+                                        type="email"
+                                        id="correo"
+                                        name="correo"
+                                        class="form-input has-icon"
+                                        placeholder="contacto@empresa.com"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <%# Fila 3: Dirección (ancho completo) %>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="direccion" class="form-label">DIRECCIÓN FISCAL / COMERCIAL</label>
+                                <div class="input-wrapper textarea-wrapper">
+                                    <i class="fa-solid fa-location-dot input-icon textarea-icon"></i>
+                                    <textarea
+                                        id="direccion"
+                                        name="direccion"
+                                        class="form-input form-textarea has-icon"
+                                        placeholder="Ak 68 #1-63"
+                                        rows="3"
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%# Botón de guardar %>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save" id="btnGuardar">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Guardar Cliente</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/newClient.js"></script>
+</body>
+</html>

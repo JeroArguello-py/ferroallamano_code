@@ -1,0 +1,243 @@
+/* ══════════════════════════════════════════
+   newClient.css — Registro de Nuevo Cliente
+   Complementa dashboard.css sin sobreescribirlo
+   ══════════════════════════════════════════ */
+
+/* ── Breadcrumb en topbar ── */
+.topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.breadcrumb-icon {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.breadcrumb-separator {
+    color: #d1d5db;
+    font-weight: 300;
+}
+
+.breadcrumb-current {
+    font-weight: 600;
+    color: #F57C00;
+}
+
+/* ── Ajuste sidebar: nav items con tres opciones ── */
+.sidebar-nav .nav-item {
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin: 2px 0;
+}
+
+.sidebar-nav .nav-item.active {
+    padding: 14px 16px;
+    margin: 4px 0;
+}
+
+/* ── Tarjeta del formulario ── */
+.form-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 36px 36px 30px 36px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    max-width: 860px;
+}
+
+/* ── Filas del formulario ── */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* ── Etiqueta ── */
+.form-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #374151;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+/* ── Inputs ── */
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper.textarea-wrapper {
+    align-items: flex-start;
+}
+
+.input-icon {
+    position: absolute;
+    left: 13px;
+    color: #9ca3af;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.textarea-icon {
+    top: 13px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 11px 14px;
+    background-color: #E2E8E4;
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.form-input.has-icon {
+    padding-left: 36px;
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.form-input:focus {
+    border-color: #F57C00;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.08);
+}
+
+.form-input:focus + .input-icon,
+.input-wrapper:focus-within .input-icon {
+    color: #F57C00;
+}
+
+/* ── Textarea ── */
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+    padding-top: 11px;
+}
+
+/* ── Botón guardar ── */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    background-color: #F57C00;
+    background-image: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+}
+
+.btn-save:hover {
+    background-image: linear-gradient(135deg, #FB8C00 0%, #E65100 100%);
+    box-shadow: 0 4px 14px rgba(245, 124, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(245, 124, 0, 0.25);
+}
+
+.btn-save i {
+    font-size: 14px;
+}
+
+/* ── Estado loading del botón ── */
+.btn-save.loading {
+    opacity: 0.75;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ── Feedback inline (para cuando se añada la lógica) ── */
+.form-feedback {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    display: none;
+}
+
+.form-feedback.success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-feedback.error {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: #991b1b;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── Validación visual ── */
+.form-input.is-invalid {
+    border-color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.04);
+}
+
+.field-error {
+    font-size: 11px;
+    color: #ef4444;
+    margin-top: 4px;
+    display: none;
+}
+
+.field-error.visible {
+    display: block;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-card {
+        padding: 24px 20px;
+    }
+}

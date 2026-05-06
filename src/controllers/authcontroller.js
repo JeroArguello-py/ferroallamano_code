@@ -1,9 +1,14 @@
 import authService from '../services/authService.js';
+import clientService from '../services/clientService.js';
 
 class AuthController {
     renderLogin(req, res) {
         res.render('index'); 
     }
+
+    renderNewClient(req, res) {
+    res.render('newClient');
+    }   
 
     
     renderDashboard(req, res) {
@@ -62,6 +67,15 @@ class AuthController {
             } else {
                 res.status(401).json(result);
             }
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Error interno del servidor' });
+        }
+    }
+
+    createClient(req, res) {
+        try {
+            const result = clientService.createClient(req.body);
+            res.status(result.statusCode).json(result);
         } catch (error) {
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
