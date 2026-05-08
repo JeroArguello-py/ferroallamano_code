@@ -80,6 +80,15 @@ class AuthController {
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }
+
+    getClients(req, res) {
+        try {
+            const result = clientService.getAllClients();
+            res.status(result.statusCode).json(result);
+        } catch (error) {
+            res.status(500).json({ success: false, message: 'Error interno del servidor' });
+        }
+    }
 }
 
 export default new AuthController();

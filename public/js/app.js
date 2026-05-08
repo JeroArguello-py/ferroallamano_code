@@ -17,15 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
         console.warn("⚠️ No se encontró el botón del ojito o el input de contraseña.");
     }
 
-    
+
     const loginForm = document.querySelector("#loginForm");
 
     if (loginForm) {
         console.log("🟢 Formulario 'loginForm' encontrado. Escuchando clics en Entrar...");
-        
+
         loginForm.addEventListener("submit", async function(event) {
-            event.preventDefault(); 
-            
+            event.preventDefault();
+
             console.log("⏳ Se presionó 'Entrar'. Enviando datos al servidor...");
 
             const email = document.querySelector("#email").value;
@@ -46,7 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (data.success) {
                     console.log("✅ Inicio de sesión exitoso. Redirigiendo a Dashboard...");
-                    window.location.replace('/dashboard'); 
+                    // Persistir la sesión mock con el rol del usuario:
+                    //   • localStorage → para que el JS del frontend pueda leerlo (mostrar/ocultar UI).
+                    //   • Cookie       → para que el middleware del servidor lo lea en navegaciones GET.
+                    // Cuando se migre a auth real (JWT/sesión), esto se reemplaza.
+                    if (data.user) {
+                        localStorage.setItem('ferro_user', JSON.stringify(data.user));
+                        document.cookie = `ferro_role=${encodeURIComponent(data.user.role)}; path=/; SameSite=Lax`;
+                    }
+                    window.location.replace('/dashboard');
                 } else {
                     console.log("❌ Datos incorrectos:", data.message);
                     alert("Credenciales incorrectas: " + data.message);

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1778211258710",
+    "nombre": "dasdas",
+    "sku": "dasdsa",
+    "categoria": "Tornillería",
+    "precio": 312,
+    "stock": 1,
+    "descripcion": "edas",
+    "createdAt": "2026-05-08T03:34:18.710Z",
+    "updatedAt": "2026-05-08T03:34:25.753Z"
+  },
+  {
+    "id": "1778211604334",
+    "nombre": "tornillo",
+    "sku": "tor-1",
+    "categoria": "Tornillería",
+    "precio": 120,
+    "stock": 10000,
+    "descripcion": "ola",
+    "createdAt": "2026-05-08T03:40:04.334Z",
+    "updatedAt": "2026-05-08T03:40:04.334Z"
+  }
+]
