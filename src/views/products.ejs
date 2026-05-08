@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Productos</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/products.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">FERROALLAMANO</span>
+                    <span class="logo-sub">Productos</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/productos" class="nav-item active">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="/dashboard" class="nav-item">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Ventas</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <button id="btnNuevoProducto" class="btn-sidebar-alt" type="button" hidden>+ Nuevo producto</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-search-placeholder">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchNombre" placeholder="Buscar por nombre">
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <i class="fa-regular fa-bell icon-topbar"></i>
+                    <i class="fa-regular fa-circle-user icon-topbar user-avatar"></i>
+                </div>
+            </header>
+
+            <div class="dashboard-area">
+                <div class="content-header">
+                    <div class="content-header-titles">
+                        <h1>Catálogo de Productos</h1>
+                        <p>Explora y gestiona el inventario de suministros industriales, herramientas y materiales de alta precisión.</p>
+                    </div>
+                </div>
+
+                <div class="catalog-layout">
+                    <%# ── Filtros ── %>
+                    <aside class="filters-card">
+                        <div class="filters-header">
+                            <h3><i class="fa-solid fa-sliders"></i> Filtros</h3>
+                            <button type="button" id="btnLimpiarFiltros" class="btn-clear">LIMPIAR</button>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Código SKU</label>
+                            <input type="text" id="filterSku" placeholder="Ej: FER-001">
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Rango de Precio ($)</label>
+                            <div class="price-range">
+                                <input type="number" id="filterPrecioMin" placeholder="Min" min="0">
+                                <span>-</span>
+                                <input type="number" id="filterPrecioMax" placeholder="Max" min="0">
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Disponibilidad</label>
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="filterStock" checked>
+                                <span>Disponible en Stock</span>
+                            </label>
+                            <label class="checkbox-row">
+                                <input type="checkbox" id="filterAgotado">
+                                <span>No Disponible (Agotado)</span>
+                            </label>
+                        </div>
+
+                        <button type="button" id="btnAplicarFiltros" class="btn-apply">Aplicar Filtros</button>
+                    </aside>
+
+                    <%# ── Lista de productos ── %>
+                    <section class="catalog-main">
+                        <div class="catalog-toolbar">
+                            <div class="sort-control">
+                                <label>Ordenar por:</label>
+                                <select id="sortBy">
+                                    <option value="nombre">Nombre</option>
+                                    <option value="precio">Precio</option>
+                                    <option value="stock">Stock</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="productsGrid" class="products-grid">
+                            <%# Se renderiza por JS para reflejar filtros en tiempo real %>
+                        </div>
+
+                        <div class="pagination" id="pagination"></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <%# ── Modal de edición ── %>
+    <div id="editModal" class="modal-overlay" hidden>
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Editar Producto</h2>
+                <button type="button" id="modalClose" class="modal-close" aria-label="Cerrar">&times;</button>
+            </div>
+            <form id="editForm" class="modal-form">
+                <input type="hidden" id="editId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="editNombre" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SKU / Código</label>
+                        <input type="text" id="editSku" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="editCategoria" required>
+                            <% categorias.forEach(function(cat) { %>
+                                <option value="<%= cat %>"><%= cat %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio Unitario</label>
+                        <input type="number" id="editPrecio" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <input type="number" id="editStock" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>Descripción Técnica</label>
+                        <textarea id="editDescripcion" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="modalCancel" class="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-save">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <%# Datos iniciales para el JS sin tener que volver a fetch al cargar %>
+    <script id="initial-products" type="application/json">
+        <%- JSON.stringify(products) %>
+    </script>
+    <script src="/js/products.js"></script>
+</body>
+</html>

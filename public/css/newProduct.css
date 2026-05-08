@@ -1,0 +1,45 @@
+/* ══════════════════════════════════════════
+   newProduct.css — overrides específicos para
+   el formulario de Nuevo Producto.
+   Hereda casi todo de newClient.css
+   ══════════════════════════════════════════ */
+
+/* Select dentro del formulario */
+select.form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239ca3af' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 34px;
+    cursor: pointer;
+}
+
+/* Texto de ayuda debajo de la descripción */
+.form-helper {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 6px;
+}
+
+/* Acciones alineadas a la derecha con cancelar */
+.form-actions-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+}
+
+.btn-cancel-link {
+    background: none;
+    border: none;
+    color: #F57C00;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-cancel-link:hover {
+    text-decoration: underline;
+}

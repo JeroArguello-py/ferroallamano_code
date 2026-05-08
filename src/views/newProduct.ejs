@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Nuevo Producto</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/newClient.css">
+    <link rel="stylesheet" href="/css/newProduct.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">Ferroallamano</span>
+                </div>
+                <div class="sidebar-bottom" style="padding: 0 12px; margin-bottom: 18px;">
+                    <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/clientes/nuevo'">+ Nuevo cliente</button>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/dashboard" class="nav-item">
+                        <i class="fa-solid fa-table-cells-large"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/productos" class="nav-item">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Inventario</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-breadcrumb">
+                    <i class="fa-solid fa-box-open breadcrumb-icon"></i>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Nuevo Producto</span>
+                </div>
+                <div class="topbar-actions">
+                    <i class="fa-regular fa-bell icon-topbar"></i>
+                    <i class="fa-regular fa-circle-user icon-topbar user-avatar"></i>
+                </div>
+            </header>
+
+            <div class="dashboard-area">
+                <div class="content-header">
+                    <div class="content-header-titles">
+                        <h1>Registro de Nuevo Producto</h1>
+                        <p>Ingrese los detalles del nuevo artículo para añadirlo al catálogo</p>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <form id="newProductForm">
+
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="nombre" class="form-label">NOMBRE DEL PRODUCTO</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="nombre" name="nombre" class="form-input"
+                                        placeholder="Ej. Taladro Percutor Industrial 850W" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sku" class="form-label">SKU / CÓDIGO REFERENCIA</label>
+                                <div class="input-wrapper">
+                                    <input type="text" id="sku" name="sku" class="form-input"
+                                        placeholder="FER-TLD-850" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="categoria" class="form-label">CATEGORÍA</label>
+                                <div class="input-wrapper">
+                                    <select id="categoria" name="categoria" class="form-input" required>
+                                        <option value="" disabled selected>Seleccione una categoría</option>
+                                        <% categorias.forEach(function(cat) { %>
+                                            <option value="<%= cat %>"><%= cat %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="precio" class="form-label">PRECIO UNITARIO</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-dollar-sign input-icon"></i>
+                                    <input type="number" id="precio" name="precio" step="0.01" min="0"
+                                        class="form-input has-icon" placeholder="0.00" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="stock" class="form-label">STOCK INICIAL</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-cubes-stacked input-icon"></i>
+                                    <input type="number" id="stock" name="stock" min="0"
+                                        class="form-input has-icon" placeholder="0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="descripcion" class="form-label">DESCRIPCIÓN TÉCNICA</label>
+                                <div class="input-wrapper textarea-wrapper">
+                                    <textarea id="descripcion" name="descripcion"
+                                        class="form-input form-textarea" rows="3"
+                                        placeholder="Especificaciones, materiales, dimensiones..."></textarea>
+                                </div>
+                                <p class="form-helper">Detalle las características técnicas para facilitar la búsqueda en el catálogo.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions form-actions-right">
+                            <button type="button" id="btnCancelar" class="btn-cancel-link">Cancelar</button>
+                            <button type="submit" class="btn-save" id="btnGuardar">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Guardar Producto</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/newProduct.js"></script>
+</body>
+</html>

@@ -36,6 +36,16 @@ class ClientService {
             data: createdClient
         };
     }
+
+    getAllClients() {
+        const clients = clientRepository.getAll();
+        return {
+            success: true,
+            statusCode: 200,
+            data: clients,
+            total: clients.length
+        };
+    }
 }
 
 export default new ClientService();
