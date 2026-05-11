@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Nueva Venta</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/newSale.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">FERROALLAMANO</span>
+                    <span class="logo-sub">ventas</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/productos" class="nav-item">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="/ventas/nueva" class="nav-item active">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Módulo de Ventas</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/dashboard'">+ Dashboard</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-search-placeholder"></div>
+                <div class="topbar-actions">
+                    <i class="fa-regular fa-bell icon-topbar"></i>
+                    <i class="fa-regular fa-circle-user icon-topbar user-avatar"></i>
+                </div>
+            </header>
+
+            <div class="dashboard-area">
+                <div class="content-header">
+                    <div class="content-header-titles">
+                        <h1>Nueva Venta</h1>
+                        <p>Complete los detalles para registrar una nueva transacción comercial.</p>
+                    </div>
+                    <div class="sale-meta">
+                        <div class="meta-block">
+                            <span class="meta-label">CÓDIGO DE VENTA</span>
+                            <span class="meta-value" id="codigoVenta"><%= codigoPreview %></span>
+                        </div>
+                        <div class="meta-block">
+                            <span class="meta-label">FECHA</span>
+                            <span class="meta-value">
+                                <i class="fa-regular fa-calendar-days"></i>
+                                <span id="fechaVenta"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="newSaleForm" class="sale-form">
+
+                    <%# ── Información del Cliente ────────────────────────── %>
+                    <section class="sale-card">
+                        <h2 class="sale-section-title">
+                            <i class="fa-solid fa-user"></i>
+                            Información del Cliente
+                        </h2>
+
+                        <div class="client-row">
+                            <div class="client-search-wrap">
+                                <label class="form-label">Buscar Cliente</label>
+                                <div class="autocomplete">
+                                    <div class="search-input">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                        <input type="text" id="clientSearch" placeholder="Nombre, documento, correo..." autocomplete="off">
+                                    </div>
+                                    <ul id="clientResults" class="autocomplete-list" hidden></ul>
+                                </div>
+                                <div id="selectedClient" class="selected-client" hidden>
+                                    <div class="selected-info">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <div>
+                                            <p class="selected-name"></p>
+                                            <p class="selected-doc"></p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn-link-danger" id="btnClearClient">Quitar</button>
+                                </div>
+                                <input type="hidden" id="clienteId" name="clienteId">
+                            </div>
+
+                            <button type="button" class="btn-secondary" onclick="window.location.href='/clientes/nuevo'">
+                                <i class="fa-solid fa-user-plus"></i>
+                                Nuevo Cliente
+                            </button>
+                        </div>
+                    </section>
+
+                    <%# ── Detalle de Productos ───────────────────────────── %>
+                    <section class="sale-card">
+                        <h2 class="sale-section-title">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            Detalle de Productos
+                        </h2>
+
+                        <div class="autocomplete">
+                            <div class="search-input search-input-lg">
+                                <i class="fa-solid fa-barcode"></i>
+                                <input type="text" id="productSearch" placeholder="Ingresar SKU o Nombre de producto" autocomplete="off">
+                            </div>
+                            <ul id="productResults" class="autocomplete-list" hidden></ul>
+                        </div>
+
+                        <div class="items-table-wrap">
+                            <table class="items-table">
+                                <thead>
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>PRODUCTO</th>
+                                        <th class="col-qty">CANTIDAD</th>
+                                        <th class="col-num">PRECIO UNIT.</th>
+                                        <th class="col-num">SUBTOTAL</th>
+                                        <th class="col-action"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsBody">
+                                    <tr class="empty-row">
+                                        <td colspan="6">
+                                            Aún no hay productos en esta venta. Busca un producto arriba para añadirlo.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <%# ── Notas + Totales ────────────────────────────────── %>
+                    <section class="sale-footer">
+                        <div class="notes-block">
+                            <label class="form-label" for="notas">Notas de Venta</label>
+                            <textarea id="notas" name="notas" rows="3" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
+
+                        <div class="totals-block">
+                            <div class="totals-row">
+                                <span>Subtotal:</span>
+                                <strong id="totSubtotal">$0.00</strong>
+                            </div>
+                            <div class="totals-row">
+                                <span>IVA (<span id="ivaPct"><%= Math.round(ivaRate * 100) %></span>%):</span>
+                                <strong id="totIva">$0.00</strong>
+                            </div>
+                            <div class="totals-row">
+                                <span>Descuento:</span>
+                                <strong id="totDescuento" class="negative">-$0.00</strong>
+                            </div>
+                            <div class="totals-row total-final">
+                                <span>Total:</span>
+                                <strong id="totTotal">$0.00</strong>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="sale-actions">
+                        <button type="button" class="btn-cancel" id="btnCancelar">Cancelar Venta</button>
+                        <button type="submit" class="btn-primary" id="btnGenerar">
+                            <i class="fa-regular fa-file-lines"></i>
+                            Generar Factura
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Datos iniciales que vienen del servidor
+        window.SALE_INIT = {
+            ivaRate: <%= ivaRate %>,
+            codigoPreview: "<%= codigoPreview %>"
+        };
+    </script>
+    <script src="/js/newSale.js"></script>
+</body>
+</html>
