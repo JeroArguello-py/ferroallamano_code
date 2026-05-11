@@ -46,6 +46,29 @@ class ClientService {
             total: clients.length
         };
     }
+
+    /**
+     * Búsqueda flexible (autocompletar) por nombre, documento o correo.
+     * `q` es el término de búsqueda; vacío devuelve todo (limitado).
+     */
+    searchClients(q, limit = 8) {
+        const term = (q || '').toString().trim().toLowerCase();
+        const all = clientRepository.getAll();
+        const matches = term
+            ? all.filter(c =>
+                (c.nombre || '').toLowerCase().includes(term) ||
+                (c.documento || '').toLowerCase().includes(term) ||
+                (c.correo || '').toLowerCase().includes(term)
+            )
+            : all;
+
+        return {
+            success: true,
+            statusCode: 200,
+            data: matches.slice(0, limit),
+            total: matches.length
+        };
+    }
 }
 
 export default new ClientService();

@@ -7,5 +7,14 @@
     "correo": "hola@gmail.com",
     "direccion": "AK 68",
     "createdAt": "2026-05-08T02:53:57.025Z"
+  },
+  {
+    "id": "1778468269730",
+    "nombre": "Daniel",
+    "documento": "12324324",
+    "telefono": "321",
+    "correo": "asdfas@dasdas",
+    "direccion": "dasd",
+    "createdAt": "2026-05-11T02:57:49.730Z"
   }
 ]

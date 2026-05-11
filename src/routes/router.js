@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authController from "../controllers/authcontroller.js";
 import productController from "../controllers/productController.js";
+import saleController from "../controllers/saleController.js";
 import { requireAdmin } from "../middlewares/authMiddleware.js";
 
 const router = Router();
@@ -28,5 +29,12 @@ router.get('/api/productos/:id', productController.getOne);
 // Crear y actualizar productos requiere rol admin
 router.post('/api/productos', requireAdmin, productController.create);
 router.put('/api/productos/:id', requireAdmin, productController.update);
+
+// ── Ventas ─────────────────────────────────────────────────────────────────
+router.get('/ventas/nueva', saleController.renderNewSale);
+
+router.get('/api/ventas', saleController.list);
+router.get('/api/ventas/:id', saleController.getOne);
+router.post('/api/ventas', saleController.create);
 
 export default router;

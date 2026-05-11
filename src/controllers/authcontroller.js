@@ -83,7 +83,11 @@ class AuthController {
 
     getClients(req, res) {
         try {
-            const result = clientService.getAllClients();
+            // Si viene `q`, lo tratamos como búsqueda; si no, devolvemos todos.
+            const q = req.query.q;
+            const result = q !== undefined
+                ? clientService.searchClients(q, Number(req.query.limit) || 8)
+                : clientService.getAllClients();
             res.status(result.statusCode).json(result);
         } catch (error) {
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
