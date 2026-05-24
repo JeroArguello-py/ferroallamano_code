@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Generar Factura</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/factura.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">FERROALLAMANO</span>
+                    <span class="logo-sub">dashboard</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/productos" class="nav-item">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="/ventas/nueva" class="nav-item active">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Módulo de Ventas</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/dashboard'">+ Dashboard</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <% if (!factura) { %>
+                <div class="dashboard-area">
+                    <div class="factura-error">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <h2>No se pudo cargar la factura</h2>
+                        <p><%= error || 'Factura no encontrada.' %></p>
+                        <button class="btn-emit" onclick="window.location.href='/ventas/nueva'">Volver a Ventas</button>
+                    </div>
+                </div>
+            <% } else {
+                const money = (n) => '$ ' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const d = new Date(factura.fechaEmision);
+                const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+                const fechaFmt = `${String(d.getDate()).padStart(2,'0')} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+                const emitida = factura.estadoFactura === 'emitida';
+                const pagado = factura.estadoPago === 'pagado';
+                const cli = factura.clienteSnapshot || {};
+                const ivaPct = Math.round((factura.ivaRate || 0.19) * 100);
+            %>
+            <div class="dashboard-area" data-factura-id="<%= factura.id %>">
+                <%# ── Encabezado ────────────────────────────────────────── %>
+                <div class="factura-header">
+                    <div class="factura-header-titles">
+                        <h1><i class="fa-regular fa-file-lines"></i> Generar Factura</h1>
+                        <p>Revisión y emisión de comprobante fiscal.</p>
+                    </div>
+                    <div class="factura-header-actions">
+                        <button class="btn-pdf" id="btnDescargarPdf">
+                            <i class="fa-solid fa-download"></i> Descargar PDF
+                        </button>
+                        <button class="btn-emit" id="btnEmitir" <%= emitida ? 'disabled' : '' %>>
+                            <i class="fa-solid fa-file-invoice"></i>
+                            <span id="btnEmitirText"><%= emitida ? 'Factura Emitida' : 'Emitir Factura' %></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="factura-grid">
+                    <%# ── Columna izquierda ─────────────────────────────── %>
+                    <div class="factura-col-main">
+                        <section class="fcard fcard-emision">
+                            <h2 class="fcard-title"># Datos de Emisión</h2>
+                            <div class="emision-row">
+                                <div class="emision-field">
+                                    <span class="field-label">Cód. Factura <small>(codigoFact)</small></span>
+                                    <div class="field-box field-box-strong"><%= factura.codigoFactura %></div>
+                                </div>
+                                <div class="emision-field">
+                                    <span class="field-label">Cód. Venta Vinculada</span>
+                                    <div class="field-box field-box-link">
+                                        <i class="fa-solid fa-link"></i> <%= factura.codigoVenta || '—' %>
+                                    </div>
+                                </div>
+                                <div class="emision-field">
+                                    <span class="field-label">Fecha de Emisión</span>
+                                    <div class="field-box"><%= fechaFmt %></div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="fcard">
+                            <h2 class="fcard-title"><i class="fa-solid fa-list-ul"></i> Detalle de Ítems</h2>
+                            <table class="items-table">
+                                <thead>
+                                    <tr>
+                                        <th>COD.</th>
+                                        <th>DESCRIPCIÓN</th>
+                                        <th class="col-c">CANT.</th>
+                                        <th class="col-r">PRECIO UNIT.</th>
+                                        <th class="col-r">TOTAL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (!factura.items || factura.items.length === 0) { %>
+                                        <tr><td colspan="5" class="empty">Esta factura no tiene ítems.</td></tr>
+                                    <% } else { factura.items.forEach(function(it) { %>
+                                        <tr>
+                                            <td class="cell-cod"><%= it.sku || '—' %></td>
+                                            <td>
+                                                <span class="cell-name"><%= it.nombre %></span>
+                                                <% if (it.descripcion) { %><span class="cell-desc"><%= it.descripcion %></span><% } %>
+                                            </td>
+                                            <td class="col-c"><%= it.cantidad %></td>
+                                            <td class="col-r"><%= money(it.precioUnitario) %></td>
+                                            <td class="col-r cell-total"><%= money(it.subtotal) %></td>
+                                        </tr>
+                                    <% }); } %>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+
+                    <%# ── Columna derecha ───────────────────────────────── %>
+                    <div class="factura-col-side">
+                        <section class="fcard">
+                            <h2 class="fcard-title"><i class="fa-regular fa-user"></i> Cliente</h2>
+                            <p class="cliente-nombre"><%= cli.nombre || 'Cliente sin nombre' %></p>
+                            <% if (cli.direccion) { %>
+                                <p class="cliente-dir"><i class="fa-solid fa-location-dot"></i> <%= cli.direccion %></p>
+                            <% } %>
+                            <div class="cliente-grid">
+                                <div>
+                                    <span class="field-label">Doc. Cliente (RUT)</span>
+                                    <p class="cliente-val"><%= cli.documento || '—' %></p>
+                                </div>
+                                <div>
+                                    <span class="field-label">Email</span>
+                                    <p class="cliente-val cliente-email"><%= cli.correo || '—' %></p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="fcard">
+                            <h2 class="fcard-title"><i class="fa-regular fa-circle-check"></i> Estado</h2>
+                            <div class="estado-row">
+                                <span class="estado-label">Estado Factura</span>
+                                <span class="badge <%= emitida ? 'badge-green' : 'badge-yellow' %>" id="badgeFactura">
+                                    <i class="fa-solid <%= emitida ? 'fa-circle-check' : 'fa-pen-ruler' %>"></i>
+                                    <%= emitida ? 'Emitida' : 'Borrador' %>
+                                </span>
+                            </div>
+                            <div class="estado-row">
+                                <span class="estado-label">Estado Pago</span>
+                                <span class="badge <%= pagado ? 'badge-green' : 'badge-gray' %>" id="badgePago">
+                                    <i class="fa-regular <%= pagado ? 'fa-circle-check' : 'fa-clock' %>"></i>
+                                    <%= pagado ? 'Pagado' : 'Pendiente' %>
+                                </span>
+                            </div>
+                        </section>
+
+                        <section class="fcard">
+                            <h2 class="fcard-title"><i class="fa-solid fa-receipt"></i> Resumen Financiero</h2>
+                            <div class="resumen-row">
+                                <span>Subtotal</span>
+                                <span><%= money(factura.subtotal) %></span>
+                            </div>
+                            <div class="resumen-row">
+                                <span>Descuento (<%= factura.descuentoPorcentaje || 0 %>%)</span>
+                                <span class="neg">-<%= money(factura.descuento) %></span>
+                            </div>
+                            <div class="resumen-row">
+                                <span>Impuestos (IVA <%= ivaPct %>%)</span>
+                                <span><%= money(factura.iva) %></span>
+                            </div>
+                            <div class="resumen-total">
+                                <span>TOTAL A PAGAR</span>
+                                <span class="total-amount"><%= money(factura.total) %></span>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </main>
+    </div>
+
+    <script src="/js/factura.js"></script>
+</body>
+</html>

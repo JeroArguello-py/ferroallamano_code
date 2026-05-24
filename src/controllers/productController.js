@@ -1,26 +1,28 @@
 import productService from '../services/productService.js';
 
 class ProductController {
-    // ── Vistas ──────────────────────────────────────────────────────────────
-    renderCatalog(req, res) {
-        const result = productService.listProducts({});
-        res.render('products', {
-            products: result.data,
-            categorias: productService.getCategories()
-        });
+    async renderCatalog(req, res) {
+        try {
+            const result = await productService.listProducts({});
+            res.render('products', {
+                products: result.data,
+                categorias: productService.getCategories()
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error interno del servidor');
+        }
     }
 
     renderNewProduct(req, res) {
-        // El guard de admin se aplica en la ruta vía middleware.
         res.render('newProduct', {
             categorias: productService.getCategories()
         });
     }
 
-    // ── API JSON ────────────────────────────────────────────────────────────
-    list(req, res) {
+    async list(req, res) {
         try {
-            const result = productService.listProducts(req.query);
+            const result = await productService.listProducts(req.query);
             res.status(result.statusCode).json(result);
         } catch (error) {
             console.error(error);
@@ -28,29 +30,32 @@ class ProductController {
         }
     }
 
-    getOne(req, res) {
+    async getOne(req, res) {
         try {
-            const result = productService.getProduct(req.params.id);
+            const result = await productService.getProduct(req.params.id);
             res.status(result.statusCode).json(result);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }
 
-    create(req, res) {
+    async create(req, res) {
         try {
-            const result = productService.createProduct(req.body);
+            const result = await productService.createProduct(req.body);
             res.status(result.statusCode).json(result);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }
 
-    update(req, res) {
+    async update(req, res) {
         try {
-            const result = productService.updateProduct(req.params.id, req.body);
+            const result = await productService.updateProduct(req.params.id, req.body);
             res.status(result.statusCode).json(result);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }

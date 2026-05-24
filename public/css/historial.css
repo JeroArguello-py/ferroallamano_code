@@ -1,0 +1,84 @@
+/* ============ HISTORIAL DE VENTAS ============ */
+.dashboard-area { background-color: #EBF4F1; }
+
+.historial-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.historial-count i { color: #F57C00; }
+
+.historial-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 8px 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+}
+
+.historial-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.historial-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: left;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    white-space: nowrap;
+}
+
+.historial-table .col-c { text-align: center; }
+.historial-table .col-r { text-align: right; }
+
+.historial-table tbody td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #f4f4f5;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.historial-table tbody tr:last-child td { border-bottom: none; }
+.historial-table tbody tr:hover { background: #fafafa; }
+
+.cell-codigo {
+    font-weight: 600;
+    color: #9a3412;
+}
+
+.cell-total {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.cell-desc { color: #dc2626; }
+
+.historial-empty {
+    text-align: center;
+    padding: 50px 20px !important;
+    color: #9ca3af;
+}
+
+.historial-empty i {
+    font-size: 34px;
+    display: block;
+    margin-bottom: 12px;
+    color: #d1d5db;
+}
+
+.historial-empty p { font-size: 14px; }

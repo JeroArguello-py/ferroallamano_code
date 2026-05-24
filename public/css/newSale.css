@@ -482,3 +482,46 @@
     .client-row { grid-template-columns: 1fr; }
     .sale-footer { grid-template-columns: 1fr; }
 }
+
+/* ── Input de descuento por porcentaje ── */
+.totals-row-discount > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.discount-input-wrap {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 2px 8px 2px 6px;
+}
+
+.discount-input-wrap input {
+    width: 46px;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    text-align: right;
+    color: #1f2937;
+    font-family: 'Inter', sans-serif;
+    -moz-appearance: textfield;
+}
+
+.discount-input-wrap input::-webkit-outer-spin-button,
+.discount-input-wrap input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.discount-pct-symbol {
+    font-size: 13px;
+    color: #6b7280;
+    margin-left: 2px;
+}
+
+.discount-input-wrap:focus-within {
+    border-color: #F57C00;
+}

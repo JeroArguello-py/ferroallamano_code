@@ -1,7 +1,7 @@
 import clientRepository from '../repositories/clientRepository.js';
 
 class ClientService {
-    createClient(payload) {
+    async createClient(payload) {
         const { nombre, documento, telefono, correo, direccion } = payload;
 
         if (!nombre || !documento) {
@@ -12,7 +12,7 @@ class ClientService {
             };
         }
 
-        const existingClient = clientRepository.findByDocumento(documento);
+        const existingClient = await clientRepository.findByDocumento(documento.trim());
         if (existingClient) {
             return {
                 success: false,
@@ -21,7 +21,7 @@ class ClientService {
             };
         }
 
-        const createdClient = clientRepository.create({
+        const createdClient = await clientRepository.create({
             nombre: nombre.trim(),
             documento: documento.trim(),
             telefono: (telefono || '').trim(),
@@ -37,8 +37,8 @@ class ClientService {
         };
     }
 
-    getAllClients() {
-        const clients = clientRepository.getAll();
+    async getAllClients() {
+        const clients = await clientRepository.getAll();
         return {
             success: true,
             statusCode: 200,
@@ -49,11 +49,10 @@ class ClientService {
 
     /**
      * Búsqueda flexible (autocompletar) por nombre, documento o correo.
-     * `q` es el término de búsqueda; vacío devuelve todo (limitado).
      */
-    searchClients(q, limit = 8) {
+    async searchClients(q, limit = 8) {
         const term = (q || '').toString().trim().toLowerCase();
-        const all = clientRepository.getAll();
+        const all = await clientRepository.getAll();
         const matches = term
             ? all.filter(c =>
                 (c.nombre || '').toLowerCase().includes(term) ||

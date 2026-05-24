@@ -1,7 +1,7 @@
 import saleRepository from '../repositories/saleRepository.js';
 import productRepository from '../repositories/productRepository.js';
 import clientRepository from '../repositories/clientRepository.js';
-import Sale, { SaleItem, IVA_RATE } from '../models/saleModel.js';
+import { SaleItem, IVA_RATE } from '../models/saleModel.js';
 
 class SaleService {
     getIvaRate() {
@@ -9,38 +9,36 @@ class SaleService {
     }
 
     /**
-     * Construye un código de venta basado en el año y un consecutivo.
-     * Ej. VEN-2026-001
+     * Vista previa del siguiente código de venta. Ej. VEN-2026-001
      */
-    previewNextCode() {
+    async previewNextCode() {
         const year = new Date().getFullYear();
-        const seq = saleRepository.nextSequenceForYear(year);
+        const seq = await saleRepository.nextSequenceForYear(year);
         return `VEN-${year}-${String(seq).padStart(3, '0')}`;
     }
 
-    listSales() {
+    async listSales() {
+        const sales = await saleRepository.getAll();
         return {
             success: true,
             statusCode: 200,
-            data: saleRepository.getAll(),
-            total: saleRepository.getAll().length
+            data: sales,
+            total: sales.length
         };
     }
 
-    getSale(id) {
-        const sale = saleRepository.findById(id);
+    async getSale(id) {
+        const sale = await saleRepository.findById(id);
         if (!sale) return { success: false, statusCode: 404, message: 'Venta no encontrada.' };
         return { success: true, statusCode: 200, data: sale };
     }
 
     /**
-     * Crea una venta validando:
-     *  - Existencia del cliente.
-     *  - Que cada producto exista y tenga stock suficiente.
-     *  - Que la cantidad y precio sean coherentes.
-     * Luego descuenta el stock y persiste la venta.
+     * Crea una venta validando cliente, productos y stock.
+     * El descuento se recibe como porcentaje (0-100) y se calcula sobre el subtotal.
+     * El IVA se aplica sobre la base gravable (subtotal - descuento).
      */
-    createSale(payload) {
+    async createSale(payload) {
         const errors = [];
 
         if (!payload.clienteId) errors.push('Debe seleccionar un cliente.');
@@ -52,15 +50,15 @@ class SaleService {
             return { success: false, statusCode: 400, message: errors.join(' ') };
         }
 
-        const cliente = clientRepository.findById(payload.clienteId);
+        const cliente = await clientRepository.findById(payload.clienteId);
         if (!cliente) {
             return { success: false, statusCode: 404, message: 'Cliente no encontrado.' };
         }
 
-        // Validación + construcción de líneas a partir de datos actuales del producto.
+        // Validación + construcción de líneas a partir de los datos actuales del producto.
         const items = [];
         for (const raw of payload.items) {
-            const prod = productRepository.findById(raw.productId);
+            const prod = await productRepository.findById(raw.productId);
             if (!prod) {
                 return { success: false, statusCode: 404, message: `Producto no encontrado: ${raw.productId}` };
             }
@@ -87,18 +85,33 @@ class SaleService {
 
         // Totales
         const subtotal = +items.reduce((acc, it) => acc + it.subtotal, 0).toFixed(2);
-        const descuento = Math.max(0, Number(payload.descuento) || 0);
+
+        // Descuento como porcentaje (0-100). Se acepta tambien `descuento` (monto fijo)
+        // por compatibilidad, pero el porcentaje tiene prioridad.
+        let descuentoPorcentaje = Number(payload.descuentoPorcentaje);
+        if (Number.isNaN(descuentoPorcentaje)) descuentoPorcentaje = 0;
+        descuentoPorcentaje = Math.min(100, Math.max(0, descuentoPorcentaje));
+
+        let descuento;
+        if (payload.descuentoPorcentaje !== undefined) {
+            descuento = +(subtotal * (descuentoPorcentaje / 100)).toFixed(2);
+        } else {
+            // Compatibilidad: monto fijo si no viene porcentaje.
+            descuento = Math.max(0, Number(payload.descuento) || 0);
+            descuentoPorcentaje = subtotal > 0 ? +((descuento / subtotal) * 100).toFixed(2) : 0;
+        }
+
         const baseGravable = Math.max(0, subtotal - descuento);
         const iva = +(baseGravable * IVA_RATE).toFixed(2);
         const total = +(baseGravable + iva).toFixed(2);
 
         const year = new Date().getFullYear();
-        const seq = saleRepository.nextSequenceForYear(year);
+        const seq = await saleRepository.nextSequenceForYear(year);
         const codigo = `VEN-${year}-${String(seq).padStart(3, '0')}`;
 
-        const sale = saleRepository.create({
+        const sale = await saleRepository.create({
             codigo,
-            fecha: new Date().toISOString(),
+            fecha: new Date(),
             clienteId: cliente.id,
             clienteSnapshot: {
                 nombre: cliente.nombre,
@@ -107,21 +120,14 @@ class SaleService {
                 correo: cliente.correo,
                 direccion: cliente.direccion
             },
-            items,
+            items: items.map(i => ({ ...i })),
             notas: (payload.notas || '').trim(),
             subtotal,
             descuento,
+            descuentoPorcentaje,
             iva,
             total
         });
-
-        // Descontar stock de los productos involucrados.
-        for (const it of items) {
-            const prod = productRepository.findById(it.productId);
-            if (prod) {
-                productRepository.update(prod.id, { stock: prod.stock - it.cantidad });
-            }
-        }
 
         return {
             success: true,

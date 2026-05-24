@@ -1,0 +1,399 @@
+/* ============ MÓDULO DE FACTURACIÓN ============ */
+
+.dashboard-area {
+    background-color: #EBF4F1;
+}
+
+/* ── Encabezado ── */
+.factura-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 26px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.factura-header-titles h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.factura-header-titles h1 i {
+    color: #4b5563;
+}
+
+.factura-header-titles p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.factura-header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-pdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-pdf:hover {
+    background: #f3f4f6;
+}
+
+.btn-emit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-image: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(245, 124, 0, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-emit:hover:not(:disabled) {
+    filter: brightness(1.05);
+}
+
+.btn-emit:disabled {
+    background-image: none;
+    background-color: #9ca3af;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* ── Grid principal ── */
+.factura-grid {
+    display: grid;
+    grid-template-columns: 1.9fr 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.factura-col-main,
+.factura-col-side {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* ── Cards ── */
+.fcard {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.fcard-emision {
+    border-left: 4px solid #F57C00;
+}
+
+.fcard-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fcard-title i {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* ── Datos de emisión ── */
+.emision-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.emision-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.field-label small {
+    text-transform: none;
+    font-weight: 400;
+    color: #9ca3af;
+}
+
+.field-box {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.field-box-strong {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #9a3412;
+    font-weight: 700;
+}
+
+.field-box-link {
+    color: #1c6ea4;
+    font-weight: 600;
+}
+
+.field-box-link i {
+    font-size: 11px;
+    margin-right: 4px;
+}
+
+/* ── Tabla de ítems ── */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.items-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    text-align: left;
+    padding: 0 12px 12px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.items-table .col-c { text-align: center; }
+.items-table .col-r { text-align: right; }
+
+.items-table tbody td {
+    padding: 14px 12px;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #f4f4f5;
+    vertical-align: middle;
+}
+
+.items-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.cell-cod {
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.cell-name {
+    display: block;
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.cell-desc {
+    display: block;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.cell-total {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.items-table .empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 24px;
+    font-size: 13px;
+}
+
+/* ── Cliente ── */
+.cliente-nombre {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.cliente-dir {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cliente-dir i { color: #9ca3af; }
+
+.cliente-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.cliente-val {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+    margin-top: 5px;
+    word-break: break-word;
+}
+
+.cliente-email { color: #1c6ea4; }
+
+/* ── Estado ── */
+.estado-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.estado-row + .estado-row {
+    border-top: 1px solid #f4f4f5;
+}
+
+.estado-label {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge i { font-size: 10px; }
+
+.badge-yellow {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.badge-green {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.badge-gray {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ── Resumen financiero ── */
+.resumen-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #4b5563;
+    padding: 8px 0;
+}
+
+.resumen-row .neg { color: #dc2626; }
+
+.resumen-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 16px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.resumen-total span:first-child {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.total-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #F57C00;
+}
+
+/* ── Error ── */
+.factura-error {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 50px;
+    text-align: center;
+    max-width: 480px;
+    margin: 40px auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.factura-error i {
+    font-size: 40px;
+    color: #f59e0b;
+    margin-bottom: 16px;
+}
+
+.factura-error h2 {
+    font-size: 18px;
+    color: #1f2937;
+    margin-bottom: 8px;
+}
+
+.factura-error p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 22px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 980px) {
+    .factura-grid {
+        grid-template-columns: 1fr;
+    }
+    .emision-row {
+        grid-template-columns: 1fr;
+    }
+}
