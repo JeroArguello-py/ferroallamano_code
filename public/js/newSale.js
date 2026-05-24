@@ -321,8 +321,15 @@ async function submitSale(e) {
             alert('Error: ' + (data.message || 'No se pudo registrar la venta.'));
             return;
         }
-        alert(`Factura generada: ${data.data.codigo}\nTotal: ${money(data.data.total)}`);
-        window.location.href = '/dashboard';
+
+        // El backend crea la venta + una factura en estado Borrador.
+        // Navegamos a la vista de factura para que el usuario la revise y emita.
+        if (data.invoice && data.invoice.id) {
+            window.location.href = `/facturas/${encodeURIComponent(data.invoice.id)}`;
+        } else {
+            alert(`Venta registrada: ${data.data.codigo}\nTotal: ${money(data.data.total)}`);
+            window.location.href = '/dashboard';
+        }
     } catch (err) {
         console.error(err);
         alert('Error de conexión con el servidor.');

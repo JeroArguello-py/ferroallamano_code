@@ -5,10 +5,10 @@
     "sku": "dasdsa",
     "categoria": "Tornillería",
     "precio": 312,
-    "stock": 1,
+    "stock": 0,
     "descripcion": "edas",
     "createdAt": "2026-05-08T03:34:18.710Z",
-    "updatedAt": "2026-05-08T03:34:25.753Z"
+    "updatedAt": "2026-05-24T02:20:53.087Z"
   },
   {
     "id": "1778211604334",
@@ -16,9 +16,9 @@
     "sku": "tor-1",
     "categoria": "Tornillería",
     "precio": 120,
-    "stock": 10000,
+    "stock": 9999,
     "descripcion": "ola",
     "createdAt": "2026-05-08T03:40:04.334Z",
-    "updatedAt": "2026-05-08T03:40:04.334Z"
+    "updatedAt": "2026-05-18T03:24:43.278Z"
   }
 ]

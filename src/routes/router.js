@@ -2,6 +2,7 @@ import { Router } from "express";
 import authController from "../controllers/authcontroller.js";
 import productController from "../controllers/productController.js";
 import saleController from "../controllers/saleController.js";
+import invoiceController from "../controllers/invoiceController.js";
 import { requireAdmin } from "../middlewares/authMiddleware.js";
 
 const router = Router();
@@ -36,5 +37,12 @@ router.get('/ventas/nueva', saleController.renderNewSale);
 router.get('/api/ventas', saleController.list);
 router.get('/api/ventas/:id', saleController.getOne);
 router.post('/api/ventas', saleController.create);
+
+// ── Facturas ───────────────────────────────────────────────────────────────
+router.get('/facturas/:id', invoiceController.renderInvoice);
+
+router.get('/api/facturas', invoiceController.list);
+router.get('/api/facturas/:id', invoiceController.getOne);
+router.post('/api/facturas/:id/emit', invoiceController.emit);
 
 export default router;

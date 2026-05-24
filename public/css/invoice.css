@@ -1,0 +1,377 @@
+[hidden] { display: none !important; }
+
+.invoice-area {
+    flex: 1;
+    padding: 28px 36px 40px;
+    background-color: #EBF4F1;
+    overflow-y: auto;
+}
+
+/* ── Encabezado ── */
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 22px;
+    gap: 16px;
+}
+
+.invoice-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.invoice-header h1 i { color: #F57C00; }
+
+.invoice-header p {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.invoice-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-outline:hover { border-color: #F57C00; color: #F57C00; }
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: #F57C00;
+    background-image: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+.btn-primary:disabled { opacity: 0.85; cursor: default; }
+.btn-primary.emitted {
+    background-image: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* ── Layout ── */
+.invoice-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.invoice-main { display: flex; flex-direction: column; gap: 18px; }
+.invoice-aside { display: flex; flex-direction: column; gap: 18px; }
+
+/* ── Tarjetas ── */
+.invoice-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 16px;
+}
+
+.card-title i { color: #F57C00; }
+.card-title.centered { justify-content: center; }
+
+/* ── Datos de Emisión ── */
+.emision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+}
+
+.emision-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.block-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: none;
+    line-height: 1.3;
+}
+
+.block-label small {
+    color: #9ca3af;
+    font-weight: 400;
+    font-size: 9px;
+}
+
+.block-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.chip {
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chip i { color: #6b7280; font-size: 11px; }
+
+/* ── Tabla de ítems ── */
+.items-wrap { overflow-x: auto; }
+
+.invoice-items {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.invoice-items th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f1f5f4;
+}
+
+.invoice-items th.num { text-align: right; }
+
+.invoice-items td {
+    padding: 14px 12px;
+    color: #1f2937;
+    border-bottom: 1px solid #f9fafb;
+    vertical-align: top;
+}
+
+.invoice-items tr:last-child td { border-bottom: none; }
+
+.invoice-items td.cod {
+    color: #9ca3af;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    width: 80px;
+}
+
+.invoice-items td.num {
+    text-align: right;
+    color: #4b5563;
+    white-space: nowrap;
+}
+
+.invoice-items td.num.bold {
+    color: #111827;
+    font-weight: 700;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    font-size: 13px;
+}
+
+.item-desc {
+    margin: 2px 0 0;
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.invoice-items td.empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 26px 12px;
+}
+
+/* ── Notas ── */
+.notes-text {
+    font-size: 13px;
+    color: #4b5563;
+    line-height: 1.5;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 0;
+}
+
+/* ── Cliente ── */
+.client-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 6px;
+}
+
+.client-address {
+    font-size: 12px;
+    color: #6b7280;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0 0 16px;
+}
+
+.client-address i { color: #9ca3af; margin-top: 2px; }
+
+.client-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f4;
+}
+
+.client-grid + .client-grid { margin-top: 12px; }
+
+.micro-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.client-grid p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #1f2937;
+    word-break: break-word;
+}
+
+.email-cell {
+    color: #F57C00 !important;
+    font-weight: 500;
+}
+
+/* ── Estado ── */
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #374151;
+}
+
+.status-row:last-child { margin-bottom: 0; }
+
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pill-borrador {
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+}
+
+.pill-emitida {
+    background: rgba(16, 185, 129, 0.15);
+    color: #047857;
+}
+
+.pill-pendiente {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+/* ── Resumen Financiero ── */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.summary-row strong { color: #111827; font-weight: 600; }
+.summary-row .negative { color: #dc2626; }
+
+.summary-total {
+    margin-top: 12px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-total span {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: 0.5px;
+}
+
+.summary-total strong {
+    font-size: 22px;
+    color: #F57C00;
+    font-weight: 700;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .invoice-grid { grid-template-columns: 1fr; }
+    .emision-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Impresión / PDF ── */
+@media print {
+    .sidebar, .topbar, .no-print, .invoice-actions { display: none !important; }
+    .main-wrapper { display: block; }
+    .main-content { overflow: visible; }
+    .invoice-area { padding: 0; background: #ffffff; }
+    .invoice-grid { grid-template-columns: 1fr 320px; }
+    .invoice-card {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+        break-inside: avoid;
+    }
+    body { background: #ffffff; }
+}

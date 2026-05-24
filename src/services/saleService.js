@@ -1,6 +1,7 @@
 import saleRepository from '../repositories/saleRepository.js';
 import productRepository from '../repositories/productRepository.js';
 import clientRepository from '../repositories/clientRepository.js';
+import invoiceService from './invoiceService.js';
 import Sale, { SaleItem, IVA_RATE } from '../models/saleModel.js';
 
 class SaleService {
@@ -123,11 +124,16 @@ class SaleService {
             }
         }
 
+        // Crear automáticamente la factura en estado Borrador para que el
+        // usuario pueda revisarla y emitirla desde /facturas/:id
+        const invoiceResult = invoiceService.createDraftForSale(sale.id);
+
         return {
             success: true,
             statusCode: 201,
             message: 'Venta registrada exitosamente.',
-            data: sale
+            data: sale,
+            invoice: invoiceResult.success ? invoiceResult.data : null
         };
     }
 }

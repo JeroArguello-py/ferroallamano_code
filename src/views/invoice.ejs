@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Factura <%= invoice.codigo %></title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/invoice.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+<%
+    const sale = invoice.sale || {};
+    const cliente = sale.clienteSnapshot || {};
+    const items = sale.items || [];
+    const subtotal = Number(sale.subtotal) || 0;
+    const descuento = Number(sale.descuento) || 0;
+    const iva = Number(sale.iva) || 0;
+    const total = Number(sale.total) || 0;
+    const descuentoPct = subtotal > 0 ? Math.round((descuento / subtotal) * 100) : 0;
+    const ivaPct = (subtotal - descuento) > 0 ? Math.round((iva / (subtotal - descuento)) * 100) : 19;
+
+    function money(n) {
+        const num = Number(n) || 0;
+        return '$ ' + num.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function shortDate(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        return `${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+    }
+%>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">FERROALLAMANO</span>
+                    <span class="logo-sub">dashboard</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/productos" class="nav-item">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="/ventas/nueva" class="nav-item active">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Módulo de Ventas</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/dashboard'">+ Dashboard</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="invoice-area">
+                <%# ── Encabezado: título + acciones ── %>
+                <header class="invoice-header no-print">
+                    <div>
+                        <h1>
+                            <i class="fa-regular fa-file-lines"></i>
+                            Generar Factura
+                        </h1>
+                        <p>Revisión y emisión de comprobante fiscal.</p>
+                    </div>
+                    <div class="invoice-actions">
+                        <button type="button" class="btn-outline" id="btnDescargarPdf">
+                            <i class="fa-solid fa-download"></i> Descargar PDF
+                        </button>
+                        <button type="button" class="btn-primary" id="btnEmitir"
+                            <%= invoice.estado === 'Emitida' ? 'disabled' : '' %>>
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <%= invoice.estado === 'Emitida' ? 'Factura Emitida' : 'Emitir Factura' %>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="invoice-grid">
+                    <%# ── Columna izquierda ── %>
+                    <div class="invoice-main">
+
+                        <%# ── Datos de Emisión ── %>
+                        <section class="invoice-card">
+                            <h2 class="card-title">
+                                <i class="fa-solid fa-hashtag"></i>
+                                Datos de Emisión
+                            </h2>
+                            <div class="emision-grid">
+                                <div class="emision-block">
+                                    <span class="block-label">Cód. Factura<br><small>(codigoFact)</small></span>
+                                    <div class="block-value chip"><%= invoice.codigo %></div>
+                                </div>
+                                <div class="emision-block">
+                                    <span class="block-label">Cód. Venta Vinculada</span>
+                                    <div class="block-value chip">
+                                        <i class="fa-solid fa-link"></i> <%= sale.codigo || '—' %>
+                                    </div>
+                                </div>
+                                <div class="emision-block">
+                                    <span class="block-label">Fecha de Emisión</span>
+                                    <div class="block-value chip">
+                                        <%= invoice.fechaEmision ? shortDate(invoice.fechaEmision) : shortDate(new Date().toISOString()) %>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <%# ── Detalle de Ítems ── %>
+                        <section class="invoice-card">
+                            <h2 class="card-title centered">
+                                <i class="fa-solid fa-bars-staggered"></i>
+                                Detalle de Ítems
+                            </h2>
+                            <div class="items-wrap">
+                                <table class="invoice-items">
+                                    <thead>
+                                        <tr>
+                                            <th>COD.</th>
+                                            <th>DESCRIPCIÓN</th>
+                                            <th class="num">CANT.</th>
+                                            <th class="num">PRECIO UNIT.</th>
+                                            <th class="num">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (items.length === 0) { %>
+                                            <tr><td colspan="5" class="empty">Sin ítems</td></tr>
+                                        <% } else { %>
+                                            <% items.forEach(function(it) { %>
+                                                <tr>
+                                                    <td class="cod"><%= it.sku %></td>
+                                                    <td>
+                                                        <p class="item-name"><%= it.nombre %></p>
+                                                        <% if (it.descripcion) { %>
+                                                            <p class="item-desc"><%= it.descripcion %></p>
+                                                        <% } %>
+                                                    </td>
+                                                    <td class="num"><%= it.cantidad %></td>
+                                                    <td class="num"><%= money(it.precioUnitario) %></td>
+                                                    <td class="num bold"><%= money(it.subtotal) %></td>
+                                                </tr>
+                                            <% }); %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <% if (sale.notas) { %>
+                            <section class="invoice-card">
+                                <h2 class="card-title">
+                                    <i class="fa-regular fa-note-sticky"></i>
+                                    Notas de Venta
+                                </h2>
+                                <p class="notes-text"><%= sale.notas %></p>
+                            </section>
+                        <% } %>
+                    </div>
+
+                    <%# ── Columna derecha ── %>
+                    <aside class="invoice-aside">
+                        <%# Cliente %>
+                        <section class="invoice-card">
+                            <h2 class="card-title">
+                                <i class="fa-solid fa-user"></i>
+                                Cliente
+                            </h2>
+                            <p class="client-name"><%= cliente.nombre || 'Cliente sin nombre' %></p>
+                            <p class="client-address">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <%= cliente.direccion || 'Sin dirección registrada' %>
+                            </p>
+                            <div class="client-grid">
+                                <div>
+                                    <span class="micro-label">Doc. Cliente</span>
+                                    <p><%= cliente.documento || '—' %></p>
+                                </div>
+                                <div>
+                                    <span class="micro-label">Email</span>
+                                    <p class="email-cell"><%= cliente.correo || '—' %></p>
+                                </div>
+                            </div>
+                            <% if (cliente.telefono) { %>
+                                <div class="client-grid">
+                                    <div>
+                                        <span class="micro-label">Teléfono</span>
+                                        <p><%= cliente.telefono %></p>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </section>
+
+                        <%# Estado %>
+                        <section class="invoice-card">
+                            <h2 class="card-title">
+                                <i class="fa-regular fa-circle-question"></i>
+                                Estado
+                            </h2>
+                            <div class="status-row">
+                                <span>Estado Factura</span>
+                                <span class="badge-pill <%= invoice.estado === 'Emitida' ? 'pill-emitida' : 'pill-borrador' %>" id="estadoFactura">
+                                    <% if (invoice.estado === 'Emitida') { %>
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    <% } else { %>
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    <% } %>
+                                    <%= invoice.estado %>
+                                </span>
+                            </div>
+                            <div class="status-row">
+                                <span>Estado Pago</span>
+                                <span class="badge-pill pill-pendiente">
+                                    <i class="fa-regular fa-clock"></i>
+                                    <%= invoice.estadoPago %>
+                                </span>
+                            </div>
+                        </section>
+
+                        <%# Resumen financiero %>
+                        <section class="invoice-card">
+                            <h2 class="card-title">
+                                <i class="fa-solid fa-calculator"></i>
+                                Resumen Financiero
+                            </h2>
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <strong><%= money(subtotal) %></strong>
+                            </div>
+                            <% if (descuento > 0) { %>
+                                <div class="summary-row">
+                                    <span>Descuento (<%= descuentoPct %>%)</span>
+                                    <strong class="negative">-<%= money(descuento) %></strong>
+                                </div>
+                            <% } %>
+                            <div class="summary-row">
+                                <span>Impuestos (IVA <%= ivaPct %>%)</span>
+                                <strong><%= money(iva) %></strong>
+                            </div>
+                            <div class="summary-total">
+                                <span>TOTAL A PAGAR</span>
+                                <strong><%= money(total) %></strong>
+                            </div>
+                        </section>
+                    </aside>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        window.INVOICE_INIT = {
+            id: <%- JSON.stringify(invoice.id) %>,
+            estado: <%- JSON.stringify(invoice.estado) %>,
+            codigo: <%- JSON.stringify(invoice.codigo) %>
+        };
+    </script>
+    <script src="/js/invoice.js"></script>
+</body>
+</html>
