@@ -1,4 +1,4 @@
-console.log("🟢 newProduct.js cargado.");
+console.log("newProduct.js cargado.");
 
 function getCurrentUser() {
     try { return JSON.parse(localStorage.getItem('ferro_user')) || null; }
@@ -22,6 +22,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnGuardar = document.getElementById('btnGuardar');
     const btnCancelar = document.getElementById('btnCancelar');
 
+    // ── Imagen ────────────────────────────────────────────────────────────────
+    const imageUpload = document.getElementById('imageUpload');
+    const imagenInput = document.getElementById('imagenInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const btnRemoveImage = document.getElementById('btnRemoveImage');
+    let imagenBase64 = '';
+
+    function showPreview(dataUrl) {
+        imagePreview.innerHTML = `<img src="${dataUrl}" alt="Vista previa">`;
+        imagePreview.classList.add('has-image');
+        btnRemoveImage.hidden = false;
+    }
+
+    function resetPreview() {
+        imagenBase64 = '';
+        imagenInput.value = '';
+        imagePreview.classList.remove('has-image');
+        imagePreview.innerHTML = `
+            <i class="fa-solid fa-image"></i>
+            <p>Haz clic para subir una imagen</p>
+            <span class="image-hint">JPG o PNG · se ajusta automáticamente</span>`;
+        btnRemoveImage.hidden = true;
+    }
+
+    imagePreview?.addEventListener('click', () => imagenInput.click());
+
+    imagenInput?.addEventListener('change', async () => {
+        const file = imagenInput.files?.[0];
+        if (!file) return;
+        try {
+            imagenBase64 = await window.fileToResizedDataURL(file);
+            showPreview(imagenBase64);
+        } catch (err) {
+            alert(err.message || 'No se pudo procesar la imagen.');
+            resetPreview();
+        }
+    });
+
+    btnRemoveImage?.addEventListener('click', resetPreview);
+
     btnCancelar?.addEventListener('click', () => {
         window.location.href = '/productos';
     });
@@ -35,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
             categoria: form.categoria.value,
             precio: Number(form.precio.value),
             stock: Number(form.stock.value),
-            descripcion: form.descripcion.value.trim()
+            descripcion: form.descripcion.value.trim(),
+            imagen: imagenBase64 || ''
         };
 
         if (!payload.nombre || !payload.sku || !payload.categoria) {

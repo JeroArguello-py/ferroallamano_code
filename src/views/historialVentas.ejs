@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroAllamano - Historial de Ventas</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/historial.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-container">
+                    <span class="logo-main">FERROALLAMANO</span>
+                    <span class="logo-sub">ventas</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="/productos" class="nav-item">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Productos</span>
+                    </a>
+                    <a href="/ventas/nueva" class="nav-item">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                        <span>Módulo de Ventas</span>
+                    </a>
+                    <a href="/ventas/historial" class="nav-item active">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Historial</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/dashboard'">+ Dashboard</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-search-placeholder"></div>
+                <div class="topbar-actions">
+                    <i class="fa-regular fa-bell icon-topbar"></i>
+                    <i class="fa-regular fa-circle-user icon-topbar user-avatar"></i>
+                </div>
+            </header>
+
+            <div class="dashboard-area">
+                <div class="content-header">
+                    <div class="content-header-titles">
+                        <h1>Historial de Ventas</h1>
+                        <p>Registro de todas las ventas realizadas.</p>
+                    </div>
+                    <div class="historial-count">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span><%= ventas.length %> venta<%= ventas.length === 1 ? '' : 's' %></span>
+                    </div>
+                </div>
+
+                <div class="historial-card">
+                    <%
+                        const money = (n) => '$ ' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+                        const fechaFmt = (f) => {
+                            const d = new Date(f);
+                            if (isNaN(d)) return '—';
+                            return `${String(d.getDate()).padStart(2,'0')} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+                        };
+                    %>
+                    <table class="historial-table">
+                        <thead>
+                            <tr>
+                                <th>CÓDIGO</th>
+                                <th>FECHA</th>
+                                <th>CLIENTE</th>
+                                <th class="col-c">ÍTEMS</th>
+                                <th class="col-r">SUBTOTAL</th>
+                                <th class="col-r">DESCUENTO</th>
+                                <th class="col-r">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (!ventas || ventas.length === 0) { %>
+                                <tr>
+                                    <td colspan="7" class="historial-empty">
+                                        <i class="fa-solid fa-receipt"></i>
+                                        <p>Todavía no hay ventas registradas.</p>
+                                    </td>
+                                </tr>
+                            <% } else { ventas.forEach(function(v) {
+                                const numItems = (v.items || []).reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0);
+                                const cliente = (v.clienteSnapshot && v.clienteSnapshot.nombre) ? v.clienteSnapshot.nombre : 'Cliente';
+                                const pct = v.descuentoPorcentaje || 0;
+                            %>
+                                <tr>
+                                    <td class="cell-codigo"><%= v.codigo %></td>
+                                    <td><%= fechaFmt(v.fecha || v.createdAt) %></td>
+                                    <td><%= cliente %></td>
+                                    <td class="col-c"><%= numItems %></td>
+                                    <td class="col-r"><%= money(v.subtotal) %></td>
+                                    <td class="col-r cell-desc">
+                                        <%= (Number(v.descuento) > 0) ? ('-' + money(v.descuento) + (pct ? ' (' + pct + '%)' : '')) : '—' %>
+                                    </td>
+                                    <td class="col-r cell-total"><%= money(v.total) %></td>
+                                </tr>
+                            <% }); } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-console.log("🟢 products.js cargado.");
+console.log("products.js cargado.");
 
 // ────────────────────────────────────────────────────────────────────────────
 // Estado y utilidades
@@ -34,6 +34,14 @@ function formatPrice(value) {
     return num.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function escapeHtml(str = '') {
+    return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Render
 // ────────────────────────────────────────────────────────────────────────────
@@ -42,14 +50,13 @@ function renderProducts() {
     grid.innerHTML = '';
 
     if (filtered.length === 0) {
-        // Distinguir entre "no hay productos en la base" y "los filtros no devolvieron nada"
         const sinDatos = allProducts.length === 0;
         const titulo = sinDatos
             ? 'Aún no hay productos registrados'
             : 'No se encontraron productos';
         const detalle = sinDatos
             ? (isAdmin()
-                ? 'Empieza añadiendo tu primer producto desde el botón “+ Nuevo producto”.'
+                ? 'Empieza añadiendo tu primer producto desde el botón "+ Nuevo producto".'
                 : 'El administrador todavía no ha registrado productos en el catálogo.')
             : 'Ajusta los filtros o limpia la búsqueda para ver más resultados.';
 
@@ -71,10 +78,6 @@ function renderProducts() {
         const stockText = p.stock > 0 ? '● Stock' : '● Agotado';
         const cardClass = p.stock > 0 ? '' : 'card-agotado';
 
-        // Nivel de stock para colorear el indicador:
-        //  • 0      → agotado (rojo)
-        //  • 1-5    → bajo (naranja, llama la atención del admin para reabastecer)
-        //  • >5     → normal (verde)
         let stockLevelClass = 'level-ok';
         let stockLabel = `${p.stock} en stock`;
         if (p.stock <= 0) {
@@ -85,12 +88,16 @@ function renderProducts() {
             stockLabel = `${p.stock} en stock · bajo`;
         }
 
+        const imagenHtml = p.imagen
+            ? `<img src="${p.imagen}" alt="${escapeHtml(p.nombre)}" class="product-photo">`
+            : '<i class="fa-solid fa-image placeholder-icon"></i>';
+
         const card = document.createElement('article');
         card.className = `product-card ${cardClass}`.trim();
         card.innerHTML = `
             <div class="product-image">
                 <span class="badge ${stockClass}">${stockText}</span>
-                <i class="fa-solid fa-image placeholder-icon"></i>
+                ${imagenHtml}
             </div>
             <div class="product-body">
                 <h4 class="product-name">${escapeHtml(p.nombre)}</h4>
@@ -143,20 +150,13 @@ function renderPagination() {
     container.appendChild(mkBtn('›', Math.min(totalPages, currentPage + 1), { disabled: currentPage === totalPages }));
 }
 
-function escapeHtml(str = '') {
-    return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;');
-}
-
 // ────────────────────────────────────────────────────────────────────────────
 // Filtros
 // ────────────────────────────────────────────────────────────────────────────
 function applyFilters() {
     const nombre = document.getElementById('searchNombre').value.trim().toLowerCase();
     const sku = document.getElementById('filterSku').value.trim().toLowerCase();
+    const categoria = document.getElementById('filterCategoria')?.value || '';
     const min = parseFloat(document.getElementById('filterPrecioMin').value);
     const max = parseFloat(document.getElementById('filterPrecioMax').value);
     const stockOk = document.getElementById('filterStock').checked;
@@ -166,6 +166,7 @@ function applyFilters() {
     filtered = allProducts.filter(p => {
         if (nombre && !p.nombre.toLowerCase().includes(nombre)) return false;
         if (sku && !(p.sku || '').toLowerCase().includes(sku)) return false;
+        if (categoria && p.categoria !== categoria) return false;
         if (!Number.isNaN(min) && p.precio < min) return false;
         if (!Number.isNaN(max) && p.precio > max) return false;
 
@@ -190,6 +191,8 @@ function applyFilters() {
 function clearFilters() {
     document.getElementById('searchNombre').value = '';
     document.getElementById('filterSku').value = '';
+    const catSel = document.getElementById('filterCategoria');
+    if (catSel) catSel.value = '';
     document.getElementById('filterPrecioMin').value = '';
     document.getElementById('filterPrecioMax').value = '';
     document.getElementById('filterStock').checked = true;
@@ -201,6 +204,12 @@ function clearFilters() {
 // ────────────────────────────────────────────────────────────────────────────
 // Edición
 // ────────────────────────────────────────────────────────────────────────────
+// Estado de la imagen en edición:
+//   null   -> sin cambios (se conserva la actual)
+//   ''     -> el usuario quitó la foto
+//   string -> nueva imagen en base64
+let editImagenState = null;
+
 function openEditModal(id) {
     const p = allProducts.find(x => x.id === id);
     if (!p) return;
@@ -213,7 +222,29 @@ function openEditModal(id) {
     document.getElementById('editStock').value = p.stock;
     document.getElementById('editDescripcion').value = p.descripcion || '';
 
+    // Reset del estado de imagen y pintar la actual (si la hay)
+    editImagenState = null;
+    document.getElementById('editImagenInput').value = '';
+    renderEditImagePreview(p.imagen || '');
+
     document.getElementById('editModal').hidden = false;
+}
+
+function renderEditImagePreview(dataUrl) {
+    const preview = document.getElementById('editImagePreview');
+    const btnRemove = document.getElementById('editBtnRemoveImage');
+    if (dataUrl) {
+        preview.innerHTML = `<img src="${dataUrl}" alt="Vista previa">`;
+        preview.classList.add('has-image');
+        btnRemove.hidden = false;
+    } else {
+        preview.classList.remove('has-image');
+        preview.innerHTML = `
+            <i class="fa-solid fa-image"></i>
+            <p>Haz clic para subir una imagen</p>
+            <span class="image-hint">JPG o PNG · se ajusta automáticamente</span>`;
+        btnRemove.hidden = true;
+    }
 }
 
 function closeEditModal() {
@@ -232,6 +263,12 @@ async function submitEdit(e) {
         stock: Number(document.getElementById('editStock').value),
         descripcion: document.getElementById('editDescripcion').value.trim()
     };
+
+    // Solo enviamos imagen si el usuario la cambió o la quitó.
+    // (null = sin cambios -> se conserva la actual en el servidor)
+    if (editImagenState !== null) {
+        payload.imagen = editImagenState;
+    }
 
     if (!isAdmin()) {
         alert('Solo un administrador puede modificar productos.');
@@ -294,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnLimpiarFiltros').addEventListener('click', clearFilters);
     document.getElementById('searchNombre').addEventListener('input', applyFilters);
     document.getElementById('sortBy').addEventListener('change', applyFilters);
+    document.getElementById('filterCategoria')?.addEventListener('change', applyFilters);
 
     // Modal
     document.getElementById('modalClose').addEventListener('click', closeEditModal);
@@ -301,6 +339,31 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('editForm').addEventListener('submit', submitEdit);
     document.getElementById('editModal').addEventListener('click', (e) => {
         if (e.target.id === 'editModal') closeEditModal();
+    });
+
+    // Imagen dentro del modal de edición
+    const editPreview = document.getElementById('editImagePreview');
+    const editImagenInput = document.getElementById('editImagenInput');
+    const editBtnRemove = document.getElementById('editBtnRemoveImage');
+
+    editPreview?.addEventListener('click', () => editImagenInput.click());
+
+    editImagenInput?.addEventListener('change', async () => {
+        const file = editImagenInput.files?.[0];
+        if (!file) return;
+        try {
+            const dataUrl = await window.fileToResizedDataURL(file);
+            editImagenState = dataUrl;       // nueva imagen
+            renderEditImagePreview(dataUrl);
+        } catch (err) {
+            alert(err.message || 'No se pudo procesar la imagen.');
+        }
+    });
+
+    editBtnRemove?.addEventListener('click', () => {
+        editImagenState = '';                // marcar como quitada
+        editImagenInput.value = '';
+        renderEditImagePreview('');
     });
 
     applyFilters();

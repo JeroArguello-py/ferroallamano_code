@@ -111,6 +111,23 @@
 
                         <div class="form-row">
                             <div class="form-group full-width">
+                                <label class="form-label">FOTO DEL PRODUCTO <span class="label-optional">(opcional)</span></label>
+                                <div class="image-upload" id="imageUpload">
+                                    <input type="file" id="imagenInput" accept="image/*" hidden>
+                                    <div class="image-preview" id="imagePreview">
+                                        <i class="fa-solid fa-image"></i>
+                                        <p>Haz clic para subir una imagen</p>
+                                        <span class="image-hint">JPG o PNG · se ajusta automáticamente</span>
+                                    </div>
+                                    <button type="button" class="btn-remove-image" id="btnRemoveImage" hidden>
+                                        <i class="fa-solid fa-trash-can"></i> Quitar foto
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group full-width">
                                 <label for="descripcion" class="form-label">DESCRIPCIÓN TÉCNICA</label>
                                 <div class="input-wrapper textarea-wrapper">
                                     <textarea id="descripcion" name="descripcion"
@@ -135,6 +152,7 @@
         </main>
     </div>
 
+    <script src="/js/imageUtils.js"></script>
     <script src="/js/newProduct.js"></script>
 </body>
 </html>

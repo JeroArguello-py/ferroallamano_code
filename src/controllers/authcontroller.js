@@ -3,19 +3,23 @@ import clientService from '../services/clientService.js';
 
 class AuthController {
     renderLogin(req, res) {
-        res.render('index'); 
+        res.render('index');
     }
 
     renderNewClient(req, res) {
-    res.render('newClient');
-    }   
+        res.render('newClient');
+    }
 
-    
     renderDashboard(req, res) {
-        
+        // Fecha actual formateada en español (ej. "11 de mayo 2026")
+        const hoy = new Date();
+        const fechaActual = hoy
+            .toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
+            .replace(/ de (\d{4})$/, ' $1');
+
         const dashboardData = {
             resumenDiario: {
-                fecha: "22 de abril 2026",   
+                fecha: fechaActual,
                 metricaPrincipal: "Métricas de desempeño comercial"
             },
             cards: [
@@ -42,7 +46,7 @@ class AuthController {
                     trend: "-1.1%",
                     trendClass: "negative",
                     iconClass: "fa-solid fa-tag"
-                },
+                }
             ],
             categorias: [
                 { name: "Herramientas Eléctricas", percentage: 45, color: "#9c5220" },
@@ -52,15 +56,13 @@ class AuthController {
             ]
         };
 
-        
         res.render('dashboard', { data: dashboardData });
     }
 
-   
-    login(req, res) {
+    async login(req, res) {
         try {
             const { email, password } = req.body;
-            const result = authService.authenticate(email, password);
+            const result = await authService.authenticate(email, password);
 
             if (result.success) {
                 res.status(200).json(result);
@@ -68,28 +70,30 @@ class AuthController {
                 res.status(401).json(result);
             }
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }
 
-    createClient(req, res) {
+    async createClient(req, res) {
         try {
-            const result = clientService.createClient(req.body);
+            const result = await clientService.createClient(req.body);
             res.status(result.statusCode).json(result);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }
 
-    getClients(req, res) {
+    async getClients(req, res) {
         try {
-            // Si viene `q`, lo tratamos como búsqueda; si no, devolvemos todos.
             const q = req.query.q;
             const result = q !== undefined
-                ? clientService.searchClients(q, Number(req.query.limit) || 8)
-                : clientService.getAllClients();
+                ? await clientService.searchClients(q, Number(req.query.limit) || 8)
+                : await clientService.getAllClients();
             res.status(result.statusCode).json(result);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }

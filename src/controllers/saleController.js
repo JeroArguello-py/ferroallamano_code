@@ -1,16 +1,32 @@
 import saleService from '../services/saleService.js';
 
 class SaleController {
-    renderNewSale(req, res) {
-        res.render('newSale', {
-            codigoPreview: saleService.previewNextCode(),
-            ivaRate: saleService.getIvaRate()
-        });
+    async renderNewSale(req, res) {
+        try {
+            res.render('newSale', {
+                codigoPreview: await saleService.previewNextCode(),
+                ivaRate: saleService.getIvaRate()
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error interno del servidor');
+        }
     }
 
-    list(req, res) {
+    // Vista: historial de ventas (tabla)
+    async renderHistorial(req, res) {
         try {
-            const result = saleService.listSales();
+            const result = await saleService.listSales();
+            res.render('historialVentas', { ventas: result.data || [] });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error interno del servidor');
+        }
+    }
+
+    async list(req, res) {
+        try {
+            const result = await saleService.listSales();
             res.status(result.statusCode).json(result);
         } catch (error) {
             console.error(error);
@@ -18,18 +34,19 @@ class SaleController {
         }
     }
 
-    getOne(req, res) {
+    async getOne(req, res) {
         try {
-            const result = saleService.getSale(req.params.id);
+            const result = await saleService.getSale(req.params.id);
             res.status(result.statusCode).json(result);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ success: false, message: 'Error interno del servidor' });
         }
     }
 
-    create(req, res) {
+    async create(req, res) {
         try {
-            const result = saleService.createSale(req.body);
+            const result = await saleService.createSale(req.body);
             res.status(result.statusCode).json(result);
         } catch (error) {
             console.error(error);

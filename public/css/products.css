@@ -246,6 +246,13 @@
     color: #cbd5e1;
 }
 
+.product-image .product-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .badge {
     position: absolute;
     top: 10px;
@@ -578,4 +585,86 @@ body.role-user .btn-edit {
 @media (max-width: 800px) {
     .catalog-layout { grid-template-columns: 1fr; }
     .products-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Carga de imagen en el modal de edición ── */
+.label-optional {
+    font-weight: 400;
+    color: #9ca3af;
+    text-transform: none;
+}
+
+.image-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.image-preview {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    background: #f9fafb;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    overflow: hidden;
+    padding: 14px;
+}
+
+.image-preview:hover {
+    border-color: #F57C00;
+    background: #fff7ed;
+}
+
+.image-preview i {
+    font-size: 28px;
+    color: #9ca3af;
+}
+
+.image-preview p {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.image-hint {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.image-preview.has-image {
+    border-style: solid;
+    border-color: #e5e7eb;
+    background: #ffffff;
+    padding: 0;
+}
+
+.image-preview.has-image img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    display: block;
+}
+
+.btn-remove-image {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-remove-image:hover {
+    text-decoration: underline;
 }

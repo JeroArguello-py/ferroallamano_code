@@ -1,8 +1,8 @@
 import userRepository from '../repositories/userRepository.js';
 
 class AuthService {
-    authenticate(email, password) {
-        const user = userRepository.findByEmail(email);
+    async authenticate(email, password) {
+        const user = await userRepository.findByEmail(email);
 
         if (!user) {
             return { success: false, message: 'Usuario no encontrado' };

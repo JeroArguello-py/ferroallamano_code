@@ -26,6 +26,10 @@
                         <i class="fa-solid fa-money-bill-transfer"></i>
                         <span>Módulo de Ventas</span>
                     </a>
+                    <a href="/ventas/historial" class="nav-item">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Historial</span>
+                    </a>
                 </nav>
             </div>
             <div class="sidebar-bottom">
@@ -156,8 +160,13 @@
                                 <span>IVA (<span id="ivaPct"><%= Math.round(ivaRate * 100) %></span>%):</span>
                                 <strong id="totIva">$0.00</strong>
                             </div>
-                            <div class="totals-row">
-                                <span>Descuento:</span>
+                            <div class="totals-row totals-row-discount">
+                                <span>Descuento:
+                                    <span class="discount-input-wrap">
+                                        <input type="number" id="descuentoPct" min="0" max="100" step="1" value="0">
+                                        <span class="discount-pct-symbol">%</span>
+                                    </span>
+                                </span>
                                 <strong id="totDescuento" class="negative">-$0.00</strong>
                             </div>
                             <div class="totals-row total-final">

@@ -1,4 +1,4 @@
-console.log("🟢 newSale.js cargado.");
+console.log("newSale.js cargado.");
 
 // ────────────────────────────────────────────────────────────────────────────
 // Estado de la venta
@@ -6,7 +6,8 @@ console.log("🟢 newSale.js cargado.");
 const state = {
     cliente: null,           // { id, nombre, documento, ... }
     items: [],               // [{ productId, sku, nombre, descripcion, precio, stock, cantidad }]
-    ivaRate: window.SALE_INIT?.ivaRate ?? 0.19
+    ivaRate: window.SALE_INIT?.ivaRate ?? 0.19,
+    descuentoPct: 0          // porcentaje de descuento (0-100)
 };
 
 const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 2 });
@@ -105,9 +106,6 @@ const productResults = () => document.getElementById('productResults');
 
 async function fetchProducts(q) {
     try {
-        // El backend filtra por nombre o sku según el query.
-        // Usamos ambos params en paralelo y unimos del lado cliente
-        // para que “tor” matchee tanto en nombre como en SKU.
         const [nameRes, skuRes] = await Promise.all([
             fetch(`/api/productos?nombre=${encodeURIComponent(q)}`),
             fetch(`/api/productos?sku=${encodeURIComponent(q)}`)
@@ -248,7 +246,6 @@ function renderItems() {
         tbody.appendChild(tr);
     });
 
-    // Listeners
     tbody.querySelectorAll('.qty-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
@@ -266,11 +263,22 @@ function renderItems() {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Totales
+// Totales (con descuento por porcentaje)
 // ────────────────────────────────────────────────────────────────────────────
+function getDescuentoPct() {
+    const input = document.getElementById('descuentoPct');
+    let pct = parseFloat(input?.value);
+    if (Number.isNaN(pct) || pct < 0) pct = 0;
+    if (pct > 100) pct = 100;
+    return pct;
+}
+
 function recomputeTotals() {
     const subtotal = state.items.reduce((acc, it) => acc + it.precio * it.cantidad, 0);
-    const descuento = 0; // Reservado para futura UI de descuentos.
+    const pct = getDescuentoPct();
+    state.descuentoPct = pct;
+
+    const descuento = subtotal * (pct / 100);
     const base = Math.max(0, subtotal - descuento);
     const iva = base * state.ivaRate;
     const total = base + iva;
@@ -299,6 +307,7 @@ async function submitSale(e) {
     const payload = {
         clienteId: state.cliente.id,
         notas: document.getElementById('notas').value.trim(),
+        descuentoPorcentaje: getDescuentoPct(),
         items: state.items.map(it => ({
             productId: it.productId,
             cantidad: it.cantidad
@@ -321,8 +330,8 @@ async function submitSale(e) {
             alert('Error: ' + (data.message || 'No se pudo registrar la venta.'));
             return;
         }
-        alert(`Factura generada: ${data.data.codigo}\nTotal: ${money(data.data.total)}`);
-        window.location.href = '/dashboard';
+        // Venta creada: vamos a la pantalla de factura (se genera el borrador).
+        window.location.href = `/facturas/venta/${data.data.id}`;
     } catch (err) {
         console.error(err);
         alert('Error de conexión con el servidor.');
@@ -381,6 +390,17 @@ document.addEventListener('DOMContentLoaded', () => {
             productResults().hidden = true;
         }
     });
+
+    // Descuento: recalcular cuando cambia el porcentaje
+    const descuentoInput = document.getElementById('descuentoPct');
+    if (descuentoInput) {
+        descuentoInput.addEventListener('input', recomputeTotals);
+        descuentoInput.addEventListener('change', () => {
+            // Normalizar el valor mostrado (clamp 0-100)
+            descuentoInput.value = getDescuentoPct();
+            recomputeTotals();
+        });
+    }
 
     // Acciones
     document.getElementById('newSaleForm').addEventListener('submit', submitSale);

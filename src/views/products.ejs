@@ -69,6 +69,16 @@
                         </div>
 
                         <div class="filter-group">
+                            <label>Categoría</label>
+                            <select id="filterCategoria">
+                                <option value="">Todas las categorías</option>
+                                <% categorias.forEach(function(cat) { %>
+                                    <option value="<%= cat %>"><%= cat %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
                             <label>Rango de Precio ($)</label>
                             <div class="price-range">
                                 <input type="number" id="filterPrecioMin" placeholder="Min" min="0">
@@ -166,6 +176,23 @@
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>Foto del Producto <span class="label-optional">(opcional)</span></label>
+                        <div class="image-upload">
+                            <input type="file" id="editImagenInput" accept="image/*" hidden>
+                            <div class="image-preview" id="editImagePreview">
+                                <i class="fa-solid fa-image"></i>
+                                <p>Haz clic para subir una imagen</p>
+                                <span class="image-hint">JPG o PNG · se ajusta automáticamente</span>
+                            </div>
+                            <button type="button" class="btn-remove-image" id="editBtnRemoveImage" hidden>
+                                <i class="fa-solid fa-trash-can"></i> Quitar foto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" id="modalCancel" class="btn-cancel">Cancelar</button>
                     <button type="submit" class="btn-save">Guardar Cambios</button>
@@ -178,6 +205,7 @@
     <script id="initial-products" type="application/json">
         <%- JSON.stringify(products) %>
     </script>
+    <script src="/js/imageUtils.js"></script>
     <script src="/js/products.js"></script>
 </body>
 </html>
