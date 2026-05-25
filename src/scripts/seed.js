@@ -5,10 +5,10 @@
  * Uso:
  *   npm run seed
  *
- * Es idempotente: usa `updateOne(... { upsert: true })` para no duplicar
- * registros si lo corres varias veces.
+ * Es idempotente: usa upsert / comprobaciones para no duplicar registros.
  */
 
+import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -37,23 +37,15 @@ async function seedUsers() {
         { email: 'tu@empresa.com', password: '12345678', role: ROLES.USER },
         { email: 'admin@ferroallamano.com', password: 'admin1234', role: ROLES.ADMIN }
     ];
-
     for (const u of users) {
-        await User.updateOne(
-            { email: u.email },
-            { $setOnInsert: u },
-            { upsert: true }
-        );
+        await User.updateOne({ email: u.email }, { $setOnInsert: u }, { upsert: true });
     }
-    console.log(`👤 Usuarios sembrados: ${users.length}`);
+    console.log(`Usuarios sembrados: ${users.length}`);
 }
 
 async function seedClients() {
     const json = readJson('clients.json');
-    if (!json.length) {
-        console.log('📂 No hay clientes en JSON para migrar.');
-        return;
-    }
+    if (!json.length) { console.log('No hay clientes en JSON para migrar.'); return; }
     let inserted = 0;
     for (const c of json) {
         const exists = await Client.findOne({ documento: c.documento });
@@ -68,15 +60,12 @@ async function seedClients() {
             inserted++;
         }
     }
-    console.log(`📂 Clientes migrados: ${inserted}/${json.length}`);
+    console.log(`Clientes migrados: ${inserted}/${json.length}`);
 }
 
 async function seedProducts() {
     const json = readJson('products.json');
-    if (!json.length) {
-        console.log('📦 No hay productos en JSON para migrar.');
-        return;
-    }
+    if (!json.length) { console.log('No hay productos en JSON para migrar.'); return; }
     let inserted = 0;
     for (const p of json) {
         const exists = await Product.findOne({ sku: p.sku });
@@ -92,7 +81,7 @@ async function seedProducts() {
             inserted++;
         }
     }
-    console.log(`📦 Productos migrados: ${inserted}/${json.length}`);
+    console.log(`Productos migrados: ${inserted}/${json.length}`);
 }
 
 async function run() {
@@ -101,9 +90,9 @@ async function run() {
         await seedUsers();
         await seedClients();
         await seedProducts();
-        console.log('✅ Seed completado.');
+        console.log('Seed completado.');
     } catch (error) {
-        console.error('❌ Error en el seed:', error);
+        console.error('Error en el seed:', error);
         process.exitCode = 1;
     } finally {
         await mongoose.disconnect();
