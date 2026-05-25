@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const area = document.querySelector('.dashboard-area[data-factura-id]');
     if (!area) return;
     const facturaId = area.dataset.facturaId;
+    const codigoFactura = area.dataset.codigo || 'factura';
 
     const btnEmitir = document.getElementById('btnEmitir');
     const btnEmitirText = document.getElementById('btnEmitirText');
@@ -50,10 +51,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── Descargar PDF (placeholder visual por ahora) ──────────────────────────
+    // ── Descargar PDF ─────────────────────────────────────────────────────────
     if (btnPdf) {
-        btnPdf.addEventListener('click', () => {
-            alert('La descarga en PDF estará disponible próximamente.');
+        btnPdf.addEventListener('click', async () => {
+            const printable = document.getElementById('facturaPrintable');
+            if (!printable) return;
+
+            if (typeof window.html2pdf === 'undefined') {
+                alert('No se pudo cargar el generador de PDF. Verifica tu conexión a internet e intenta de nuevo.');
+                return;
+            }
+
+            const original = btnPdf.innerHTML;
+            btnPdf.disabled = true;
+            btnPdf.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando...';
+
+            const opt = {
+                margin: 8,
+                filename: `Factura-${codigoFactura}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            try {
+                await window.html2pdf().set(opt).from(printable).save();
+            } catch (err) {
+                console.error(err);
+                alert('Ocurrió un error al generar el PDF.');
+            } finally {
+                btnPdf.disabled = false;
+                btnPdf.innerHTML = original;
+            }
         });
     }
 });

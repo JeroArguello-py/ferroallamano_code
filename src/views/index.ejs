@@ -6,18 +6,20 @@
     <title>FerroAllamano - Iniciar Sesión</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 </head>
 <body>
     <div class="login-container">
         <div class="login-card">
             <div class="card-header">
+                <div class="brand-logo">FA</div>
                 <h1>FERROALLAMANO</h1>
-                <p class="subtitle">Lo mejor de ocaña</p>
+                <p class="subtitle">Suministros industriales y ferretería</p>
             </div>
-            
+
             <div class="form-header">
-                <h2>Iniciar Sesión</h2>
-                <p class="welcome">bienvenido</p>
+                <h2>Iniciar sesión</h2>
+                <p class="welcome">Bienvenido de nuevo, ingresa tus credenciales</p>
             </div>
 
             <form id="loginForm">
@@ -28,14 +30,9 @@
                         <input type="email" id="email" placeholder="tu@empresa.com" required>
                     </div>
                 </div>
-                
-                
-            
+
                 <div class="input-group">
-                    <div class="label-row">
-                        <label for="password">CONTRASEÑA</label>
-                        <a href="#" class="forgot-pass">Olvidé mi contraseña</a>
-                    </div>
+                    <label for="password">CONTRASEÑA</label>
                     <div class="input-wrapper">
                         <i class="fa-solid fa-lock icon"></i>
                         <input type="password" id="password" placeholder="••••••••" required>
@@ -48,7 +45,9 @@
                     <label for="remember">Recuérdame</label>
                 </div>
 
-                <button type="submit" class="btn-submit">Entrar</button>
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-right-to-bracket"></i> Entrar
+                </button>
             </form>
         </div>
     </div>
