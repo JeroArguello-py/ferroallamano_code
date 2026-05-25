@@ -1,5 +1,10 @@
 import authService from '../services/authService.js';
 import clientService from '../services/clientService.js';
+import dashboardService from '../services/dashboardService.js';
+
+const money = (n) => '$ ' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const trendClass = (t) => t > 0 ? 'positive' : (t < 0 ? 'negative' : 'neutral');
+const trendText = (t) => `${t > 0 ? '+' : ''}${t}%`;
 
 class AuthController {
     renderLogin(req, res) {
@@ -10,60 +15,65 @@ class AuthController {
         res.render('newClient');
     }
 
-    renderDashboard(req, res) {
-        // Fecha actual formateada en español (ej. "11 de mayo 2026")
-        const hoy = new Date();
-        const fechaActual = hoy
-            .toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
-            .replace(/ de (\d{4})$/, ' $1');
+    async renderDashboard(req, res) {
+        try {
+            const hoy = new Date();
+            const fechaActual = hoy
+                .toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
+                .replace(/ de (\d{4})$/, ' $1');
 
-        const dashboardData = {
-            resumenDiario: {
-                fecha: fechaActual,
-                metricaPrincipal: "Métricas de desempeño comercial"
-            },
-            cards: [
-                {
-                    title: "TOTAL VENDIDO",
-                    value: "$42,500.000",
-                    vsAyer: "$37,775",
-                    trend: "+12.5%",
-                    trendClass: "positive",
-                    iconClass: "fa-regular fa-money-bill-1"
-                },
-                {
-                    title: "TRANSACCIONES",
-                    value: "184",
-                    vsAyer: "Operaciones completadas",
-                    trend: "+4.2%",
-                    trendClass: "positive",
-                    iconClass: "fa-solid fa-file-invoice-dollar"
-                },
-                {
-                    title: "PROMEDIO VENTA",
-                    value: "$230.973",
-                    vsAyer: "Por transacción",
-                    trend: "-1.1%",
-                    trendClass: "negative",
-                    iconClass: "fa-solid fa-tag"
-                }
-            ],
-            categorias: [
-                { name: "Herramientas Eléctricas", percentage: 45, color: "#9c5220" },
-                { name: "Tornillería", percentage: 30, color: "#f9bc1d" },
-                { name: "Pinturas y Acabados", percentage: 15, color: "#1c6ea4" },
-                { name: "Otros", percentage: 10, color: "#6b7280" }
-            ]
-        };
+            const r = await dashboardService.getResumen();
 
-        res.render('dashboard', { data: dashboardData });
+            const dashboardData = {
+                resumen: {
+                    fecha: fechaActual,
+                    metricaPrincipal: 'Indicadores de tu operación comercial'
+                },
+                cards: [
+                    {
+                        title: 'TOTAL VENDIDO',
+                        value: money(r.totalVendido),
+                        vsAyer: `Hoy: ${money(r.totalHoy)}`,
+                        trend: trendText(r.trendTotal),
+                        trendClass: trendClass(r.trendTotal),
+                        iconClass: 'fa-solid fa-dollar-sign'
+                    },
+                    {
+                        title: 'TRANSACCIONES',
+                        value: String(r.transacciones),
+                        vsAyer: `${r.txHoy} hoy · ${r.txAyer} ayer`,
+                        trend: trendText(r.trendTx),
+                        trendClass: trendClass(r.trendTx),
+                        iconClass: 'fa-solid fa-receipt'
+                    },
+                    {
+                        title: 'PROMEDIO POR VENTA',
+                        value: money(r.promedio),
+                        vsAyer: 'Ticket promedio',
+                        trend: '',
+                        trendClass: 'neutral',
+                        iconClass: 'fa-solid fa-chart-line'
+                    }
+                ],
+                resumenRapido: [
+                    { label: 'Productos en stock', value: `${r.productosActivos} / ${r.productosTotal}`, icon: 'fa-solid fa-boxes-stacked' },
+                    { label: 'Clientes registrados', value: String(r.clientes), icon: 'fa-solid fa-users' },
+                    { label: 'Ventas hoy', value: String(r.txHoy), icon: 'fa-solid fa-cart-shopping' }
+                ],
+                categorias: r.categorias
+            };
+
+            res.render('dashboard', { data: dashboardData });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error interno del servidor');
+        }
     }
 
     async login(req, res) {
         try {
             const { email, password } = req.body;
             const result = await authService.authenticate(email, password);
-
             if (result.success) {
                 res.status(200).json(result);
             } else {

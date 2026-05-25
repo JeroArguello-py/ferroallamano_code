@@ -6,7 +6,7 @@
     <title>FerroAllamano - Dashboard</title>
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 </head>
 <body>
     <div class="main-wrapper">
@@ -17,11 +17,15 @@
                     <span class="logo-sub">dashboard</span>
                 </div>
                 <nav class="sidebar-nav">
+                    <a href="/dashboard" class="nav-item active">
+                        <i class="fa-solid fa-table-cells-large"></i>
+                        <span>Dashboard</span>
+                    </a>
                     <a href="/productos" class="nav-item">
                         <i class="fa-solid fa-box-open"></i>
                         <span>Productos</span>
                     </a>
-                    <a href="#" class="nav-item active">
+                    <a href="/ventas/nueva" class="nav-item">
                         <i class="fa-solid fa-money-bill-transfer"></i>
                         <span>Módulo de Ventas</span>
                     </a>
@@ -35,7 +39,6 @@
                 <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/clientes/nuevo'">+ Nuevo cliente</button>
                 <button id="btnDashboardNuevoProducto" class="btn-sidebar-alt" type="button" hidden onclick="window.location.href='/productos/nuevo'">+ Nuevo Producto</button>
                 <button class="btn-sidebar-alt" type="button" onclick="window.location.href='/ventas/nueva'">+ Nueva Venta</button>
-
             </div>
         </aside>
 
@@ -48,15 +51,15 @@
                 </div>
             </header>
 
-            <div class="dashboard-area">    
+            <div class="dashboard-area">
                 <div class="content-header">
                     <div class="content-header-titles">
-                        <h1>Resumen Diario</h1>
-                        <p><%= data.resumenDiario.metricaPrincipal %></p>
+                        <h1>Resumen General</h1>
+                        <p><%= data.resumen.metricaPrincipal %></p>
                     </div>
                     <div class="date-picker-placeholder">
                         <i class="fa-regular fa-calendar-days"></i>
-                        <span><%= data.resumenDiario.fecha %></span>
+                        <span><%= data.resumen.fecha %></span>
                     </div>
                 </div>
 
@@ -64,45 +67,66 @@
                     <% data.cards.forEach(function(card) { %>
                         <div class="stat-card">
                             <div class="card-top-row">
-                                <i class="<%= card.iconClass %> icon-card-stat"></i>
-                                <div class="trend-pill <%= card.trendClass %>">
-                                    <span><%= card.trend %></span>
-                                </div>
+                                <span class="stat-icon"><i class="<%= card.iconClass %>"></i></span>
+                                <% if (card.trend) { %>
+                                    <div class="trend-pill <%= card.trendClass %>"><span><%= card.trend %></span></div>
+                                <% } %>
                             </div>
-                            
                             <div class="card-main-content">
                                 <p class="card-title-stat"><%= card.title %></p>
                                 <p class="card-value-stat"><%= card.value %></p>
                             </div>
-                            
-                            <p class="card-vs-yesterday">vs. ayer (<%= card.vsAyer %>)</p>
-                            
+                            <p class="card-vs-yesterday"><%= card.vsAyer %></p>
                         </div>
-                        
-                        
                     <% }); %>
                 </section>
-            
 
-                <section class="chart-section">
+                <section class="dash-bottom">
                     <div class="chart-card">
-                        <p class="chart-title">Top Categorías</p>
-                        <div class="chart-bars-list">
-                            <% data.categorias.forEach(function(cat) { %>
-                                <div class="chart-bar-item">
-                                    <div class="bar-label">
-                                        <span class="color-dot" style="background-color: <%= cat.color %>;"></span>
-                                        <span class="category-name"><%= cat.name %></span>
-                                    </div>
-                                    <div class="bar-container-wrapper">
-                                        <div class="bar-container-bg">
-                                            <div class="bar-fill" style="width: <%= cat.percentage %>%; background-color: <%= cat.color %>;"></div>
+                        <p class="chart-title">Top Categorías por ingresos</p>
+                        <% if (!data.categorias || data.categorias.length === 0) { %>
+                            <div class="chart-empty">
+                                <i class="fa-solid fa-chart-simple"></i>
+                                <p>Aún no hay ventas registradas para mostrar categorías.</p>
+                            </div>
+                        <% } else { %>
+                            <div class="chart-bars-list">
+                                <% data.categorias.forEach(function(cat) { %>
+                                    <div class="chart-bar-item">
+                                        <div class="bar-label">
+                                            <div class="bar-label-left">
+                                                <span class="color-dot" style="background-color: <%= cat.color %>;"></span>
+                                                <span class="category-name"><%= cat.name %></span>
+                                            </div>
                                         </div>
-                                        <span class="category-percentage"><%= cat.percentage %>%</span>
+                                        <div class="bar-container-wrapper">
+                                            <div class="bar-container-bg">
+                                                <div class="bar-fill" style="width: <%= cat.percentage %>%; background-color: <%= cat.color %>;"></div>
+                                            </div>
+                                            <span class="category-percentage"><%= cat.percentage %>%</span>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="side-card">
+                        <p class="chart-title">Resumen rápido</p>
+                        <div class="quick-list">
+                            <% data.resumenRapido.forEach(function(q) { %>
+                                <div class="quick-item">
+                                    <span class="quick-icon"><i class="<%= q.icon %>"></i></span>
+                                    <div class="quick-text">
+                                        <span class="quick-label"><%= q.label %></span>
+                                        <span class="quick-value"><%= q.value %></span>
                                     </div>
                                 </div>
                             <% }); %>
                         </div>
+                        <button class="quick-cta" type="button" onclick="window.location.href='/ventas/nueva'">
+                            <i class="fa-solid fa-plus"></i> Registrar nueva venta
+                        </button>
                     </div>
                 </section>
             </div>
@@ -115,9 +139,7 @@
             try {
                 const user = JSON.parse(localStorage.getItem('ferro_user') || 'null');
                 const btn = document.getElementById('btnDashboardNuevoProducto');
-                if (btn && user && user.role === 'admin') {
-                    btn.hidden = false;
-                }
+                if (btn && user && user.role === 'admin') btn.hidden = false;
             } catch (_) { /* noop */ }
         })();
     </script>

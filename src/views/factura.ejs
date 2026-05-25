@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FerroAllamano - Generar Factura</title>
+    <title>FerroAllamano - Factura</title>
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/factura.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 </head>
 <body>
     <div class="main-wrapper">
@@ -15,7 +15,7 @@
             <div class="sidebar-top">
                 <div class="logo-container">
                     <span class="logo-main">FERROALLAMANO</span>
-                    <span class="logo-sub">dashboard</span>
+                    <span class="logo-sub">facturación</span>
                 </div>
                 <nav class="sidebar-nav">
                     <a href="/productos" class="nav-item">
@@ -25,6 +25,10 @@
                     <a href="/ventas/nueva" class="nav-item active">
                         <i class="fa-solid fa-money-bill-transfer"></i>
                         <span>Módulo de Ventas</span>
+                    </a>
+                    <a href="/ventas/historial" class="nav-item">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Historial</span>
                     </a>
                 </nav>
             </div>
@@ -44,23 +48,32 @@
                     </div>
                 </div>
             <% } else {
+                const empresa = {
+                    nombre: 'FERROALLAMANO S.A.S.',
+                    eslogan: 'Suministros industriales y ferretería',
+                    nit: '900.123.456-7',
+                    direccion: 'Ak 68 #1-63, Bogotá D.C.',
+                    telefono: '+57 320 407 1924',
+                    correo: 'contacto@ferroallamano.com'
+                };
                 const money = (n) => '$ ' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 const d = new Date(factura.fechaEmision);
                 const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-                const fechaFmt = `${String(d.getDate()).padStart(2,'0')} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+                const fechaFmt = isNaN(d) ? '—' : `${String(d.getDate()).padStart(2,'0')} ${meses[d.getMonth()]} ${d.getFullYear()}`;
                 const emitida = factura.estadoFactura === 'emitida';
                 const pagado = factura.estadoPago === 'pagado';
                 const cli = factura.clienteSnapshot || {};
                 const ivaPct = Math.round((factura.ivaRate || 0.19) * 100);
             %>
-            <div class="dashboard-area" data-factura-id="<%= factura.id %>">
-                <%# ── Encabezado ────────────────────────────────────────── %>
-                <div class="factura-header">
-                    <div class="factura-header-titles">
-                        <h1><i class="fa-regular fa-file-lines"></i> Generar Factura</h1>
+            <div class="dashboard-area" data-factura-id="<%= factura.id %>" data-codigo="<%= factura.codigoFactura %>">
+
+                <%# ── Barra de acciones (no se incluye en el PDF) ─────────── %>
+                <div class="factura-actionbar">
+                    <div class="ab-titles">
+                        <h1>Factura</h1>
                         <p>Revisión y emisión de comprobante fiscal.</p>
                     </div>
-                    <div class="factura-header-actions">
+                    <div class="ab-actions">
                         <button class="btn-pdf" id="btnDescargarPdf">
                             <i class="fa-solid fa-download"></i> Descargar PDF
                         </button>
@@ -71,125 +84,132 @@
                     </div>
                 </div>
 
-                <div class="factura-grid">
-                    <%# ── Columna izquierda ─────────────────────────────── %>
-                    <div class="factura-col-main">
-                        <section class="fcard fcard-emision">
-                            <h2 class="fcard-title"># Datos de Emisión</h2>
-                            <div class="emision-row">
-                                <div class="emision-field">
-                                    <span class="field-label">Cód. Factura <small>(codigoFact)</small></span>
-                                    <div class="field-box field-box-strong"><%= factura.codigoFactura %></div>
-                                </div>
-                                <div class="emision-field">
-                                    <span class="field-label">Cód. Venta Vinculada</span>
-                                    <div class="field-box field-box-link">
-                                        <i class="fa-solid fa-link"></i> <%= factura.codigoVenta || '—' %>
-                                    </div>
-                                </div>
-                                <div class="emision-field">
-                                    <span class="field-label">Fecha de Emisión</span>
-                                    <div class="field-box"><%= fechaFmt %></div>
-                                </div>
-                            </div>
-                        </section>
+                <%# ── Hoja de factura (esto es lo que se exporta a PDF) ───── %>
+                <div class="invoice-sheet" id="facturaPrintable">
 
-                        <section class="fcard">
-                            <h2 class="fcard-title"><i class="fa-solid fa-list-ul"></i> Detalle de Ítems</h2>
-                            <table class="items-table">
-                                <thead>
-                                    <tr>
-                                        <th>COD.</th>
-                                        <th>DESCRIPCIÓN</th>
-                                        <th class="col-c">CANT.</th>
-                                        <th class="col-r">PRECIO UNIT.</th>
-                                        <th class="col-r">TOTAL</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (!factura.items || factura.items.length === 0) { %>
-                                        <tr><td colspan="5" class="empty">Esta factura no tiene ítems.</td></tr>
-                                    <% } else { factura.items.forEach(function(it) { %>
-                                        <tr>
-                                            <td class="cell-cod"><%= it.sku || '—' %></td>
-                                            <td>
-                                                <span class="cell-name"><%= it.nombre %></span>
-                                                <% if (it.descripcion) { %><span class="cell-desc"><%= it.descripcion %></span><% } %>
-                                            </td>
-                                            <td class="col-c"><%= it.cantidad %></td>
-                                            <td class="col-r"><%= money(it.precioUnitario) %></td>
-                                            <td class="col-r cell-total"><%= money(it.subtotal) %></td>
-                                        </tr>
-                                    <% }); } %>
-                                </tbody>
-                            </table>
-                        </section>
-                    </div>
-
-                    <%# ── Columna derecha ───────────────────────────────── %>
-                    <div class="factura-col-side">
-                        <section class="fcard">
-                            <h2 class="fcard-title"><i class="fa-regular fa-user"></i> Cliente</h2>
-                            <p class="cliente-nombre"><%= cli.nombre || 'Cliente sin nombre' %></p>
-                            <% if (cli.direccion) { %>
-                                <p class="cliente-dir"><i class="fa-solid fa-location-dot"></i> <%= cli.direccion %></p>
-                            <% } %>
-                            <div class="cliente-grid">
-                                <div>
-                                    <span class="field-label">Doc. Cliente (RUT)</span>
-                                    <p class="cliente-val"><%= cli.documento || '—' %></p>
-                                </div>
-                                <div>
-                                    <span class="field-label">Email</span>
-                                    <p class="cliente-val cliente-email"><%= cli.correo || '—' %></p>
-                                </div>
+                    <header class="inv-header">
+                        <div class="inv-brand">
+                            <div class="inv-logo">FA</div>
+                            <div class="inv-brand-text">
+                                <h2><%= empresa.nombre %></h2>
+                                <p><%= empresa.eslogan %></p>
                             </div>
-                        </section>
+                        </div>
+                        <div class="inv-meta">
+                            <span class="inv-doc-type">FACTURA</span>
+                            <p class="inv-codigo"><%= factura.codigoFactura %></p>
+                            <span class="badge <%= emitida ? 'badge-green' : 'badge-yellow' %>" id="badgeFactura">
+                                <i class="fa-solid <%= emitida ? 'fa-circle-check' : 'fa-pen-ruler' %>"></i>
+                                <%= emitida ? 'Emitida' : 'Borrador' %>
+                            </span>
+                        </div>
+                    </header>
 
-                        <section class="fcard">
-                            <h2 class="fcard-title"><i class="fa-regular fa-circle-check"></i> Estado</h2>
-                            <div class="estado-row">
-                                <span class="estado-label">Estado Factura</span>
-                                <span class="badge <%= emitida ? 'badge-green' : 'badge-yellow' %>" id="badgeFactura">
-                                    <i class="fa-solid <%= emitida ? 'fa-circle-check' : 'fa-pen-ruler' %>"></i>
-                                    <%= emitida ? 'Emitida' : 'Borrador' %>
-                                </span>
+                    <div class="inv-accent-bar"></div>
+
+                    <section class="inv-parties">
+                        <div class="inv-party">
+                            <span class="inv-party-label">Emisor</span>
+                            <p class="inv-party-name"><%= empresa.nombre %></p>
+                            <p>NIT: <%= empresa.nit %></p>
+                            <p><%= empresa.direccion %></p>
+                            <p><%= empresa.telefono %></p>
+                            <p><%= empresa.correo %></p>
+                        </div>
+                        <div class="inv-party">
+                            <span class="inv-party-label">Facturar a</span>
+                            <p class="inv-party-name"><%= cli.nombre || 'Cliente sin nombre' %></p>
+                            <p>Doc: <%= cli.documento || '—' %></p>
+                            <% if (cli.direccion) { %><p><%= cli.direccion %></p><% } %>
+                            <% if (cli.telefono) { %><p><%= cli.telefono %></p><% } %>
+                            <p><%= cli.correo || '—' %></p>
+                        </div>
+                        <div class="inv-party inv-party-data">
+                            <div class="inv-data-row">
+                                <span>Cód. Venta</span>
+                                <strong><%= factura.codigoVenta || '—' %></strong>
                             </div>
-                            <div class="estado-row">
-                                <span class="estado-label">Estado Pago</span>
+                            <div class="inv-data-row">
+                                <span>Fecha de emisión</span>
+                                <strong><%= fechaFmt %></strong>
+                            </div>
+                            <div class="inv-data-row">
+                                <span>Estado de pago</span>
                                 <span class="badge <%= pagado ? 'badge-green' : 'badge-gray' %>" id="badgePago">
                                     <i class="fa-regular <%= pagado ? 'fa-circle-check' : 'fa-clock' %>"></i>
                                     <%= pagado ? 'Pagado' : 'Pendiente' %>
                                 </span>
                             </div>
-                        </section>
+                        </div>
+                    </section>
 
-                        <section class="fcard">
-                            <h2 class="fcard-title"><i class="fa-solid fa-receipt"></i> Resumen Financiero</h2>
-                            <div class="resumen-row">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th class="col-cod">CÓD.</th>
+                                <th>DESCRIPCIÓN</th>
+                                <th class="col-c">CANT.</th>
+                                <th class="col-r">PRECIO UNIT.</th>
+                                <th class="col-r">IMPORTE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (!factura.items || factura.items.length === 0) { %>
+                                <tr><td colspan="5" class="inv-empty">Esta factura no tiene ítems.</td></tr>
+                            <% } else { factura.items.forEach(function(it) { %>
+                                <tr>
+                                    <td class="col-cod"><%= it.sku || '—' %></td>
+                                    <td>
+                                        <span class="inv-item-name"><%= it.nombre %></span>
+                                        <% if (it.descripcion) { %><span class="inv-item-desc"><%= it.descripcion %></span><% } %>
+                                    </td>
+                                    <td class="col-c"><%= it.cantidad %></td>
+                                    <td class="col-r"><%= money(it.precioUnitario) %></td>
+                                    <td class="col-r inv-item-total"><%= money(it.subtotal) %></td>
+                                </tr>
+                            <% }); } %>
+                        </tbody>
+                    </table>
+
+                    <section class="inv-summary">
+                        <div class="inv-notes">
+                            <% if (factura.notas) { %>
+                                <span class="inv-notes-label">Notas</span>
+                                <p><%= factura.notas %></p>
+                            <% } %>
+                        </div>
+                        <div class="inv-totals">
+                            <div class="inv-total-row">
                                 <span>Subtotal</span>
                                 <span><%= money(factura.subtotal) %></span>
                             </div>
-                            <div class="resumen-row">
-                                <span>Descuento (<%= factura.descuentoPorcentaje || 0 %>%)</span>
+                            <div class="inv-total-row">
+                                <span>Descuento<%= factura.descuentoPorcentaje ? ' (' + factura.descuentoPorcentaje + '%)' : '' %></span>
                                 <span class="neg">-<%= money(factura.descuento) %></span>
                             </div>
-                            <div class="resumen-row">
-                                <span>Impuestos (IVA <%= ivaPct %>%)</span>
+                            <div class="inv-total-row">
+                                <span>IVA (<%= ivaPct %>%)</span>
                                 <span><%= money(factura.iva) %></span>
                             </div>
-                            <div class="resumen-total">
+                            <div class="inv-total-grand">
                                 <span>TOTAL A PAGAR</span>
-                                <span class="total-amount"><%= money(factura.total) %></span>
+                                <span><%= money(factura.total) %></span>
                             </div>
-                        </section>
-                    </div>
+                        </div>
+                    </section>
+
+                    <footer class="inv-footer">
+                        <p class="inv-thanks">Gracias por su compra.</p>
+                        <p class="inv-legal">Documento generado electrónicamente por <%= empresa.nombre %>. Este comprobante es válido sin firma autógrafa.</p>
+                    </footer>
                 </div>
             </div>
             <% } %>
         </main>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+        onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js';document.head.appendChild(s);"></script>
     <script src="/js/factura.js"></script>
 </body>
 </html>
