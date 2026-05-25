@@ -21,11 +21,17 @@ app.use('/', router);
 
 const PORT = process.env.PORT || 3000;
 
-// Conectar primero a MongoDB y luego levantar el servidor
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
+// Durante las pruebas (NODE_ENV === 'test', que Jest define automáticamente)
+// NO conectamos a MongoDB ni abrimos un puerto: Supertest usa la `app`
+// directamente y los repositorios se mockean. Así la app es importable y
+// testeable sin depender de una base de datos real.
+if (process.env.NODE_ENV !== 'test') {
+    // Conectar primero a MongoDB y luego levantar el servidor
+    connectDB().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        });
     });
-});
+}
 
 export default app;

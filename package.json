@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:gris": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPatterns=\\.gris\\.test\\.js$",
     "start": "node --env-file=.env src/app.js",
     "dev": "nodemon --exec \"node --env-file=.env\" src/app.js",
     "seed": "node --env-file=.env src/scripts/seed.js"
