@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -24,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 // Conectar primero a MongoDB y luego levantar el servidor
 connectDB().then(() => {
     app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        console.log(`Servidor corriendo en el puerto ${PORT}`);
     });
 });
 
